@@ -25,7 +25,28 @@
 //Make sure that you close the file with fclose before returning.
 Image *readData(char *filename) 
 {
-	//YOUR CODE HERE
+	char format[10];
+	int col, row, max;
+	FILE* fp;
+	fp = fopen(filename, "r");
+	fscanf(fp, "%s\n", format);
+	fscanf(fp, "%d %d\n", &col, &row);
+	fscanf(fp, "%d\n", &max);
+	Color colors[row][col];
+	for (int i=0; i<row; i++) {
+		Color color;
+		for (int j=0; j<col; j++) {
+			fscanf(fp, "%d %d %d", &color.R, &color.G, &color.B);
+			colors[i][j] = color;
+		}
+	}
+	fclose(fp);
+	Image image;
+	image.rows = row;
+	image.cols = col;
+	image.image = colors;
+	Image* image_ptr = &image;
+	return image_ptr;
 }
 
 //Given an image, prints to stdout (e.g. with printf) a .ppm P3 file with the image's data.
