@@ -4,7 +4,7 @@
 
 The following are discussions, labs, projects checklists
 
-## Discussions
+## Discussions (0/14)
 1. Disc1 &nbsp; - ***ONGOING***
 1. Disc2 &nbsp;  - ***ONGOING***
 1. Disc3 &nbsp;  - ***ONGOING***
@@ -20,8 +20,8 @@ The following are discussions, labs, projects checklists
 1. Disc13 - ***ONGOING***
 1. Disc14 - ***ONGOING***
 
-## Labs
-1. Lab1 &nbsp;  - ***ONGOING***
+## Labs (1/11)
+1. Lab1 &nbsp;  - ***COMPLETED*** 
 1. Lab2 &nbsp;  - ***ONGOING***
 1. Lab3 &nbsp;  - ***ONGOING***
 1. Lab4 &nbsp;  - ***ONGOING***
@@ -33,7 +33,7 @@ The following are discussions, labs, projects checklists
 1. Lab10 - ***ONGOING***
 1. Lab11 - ***ONGOING***
 
-## Projects
+## Projects (0/4)
 1. Proj1 - ***ONGOING***
 1. Proj2 - ***ONGOING***
 1. Proj3 - ***ONGOING***
