@@ -25,38 +25,63 @@
 //Make sure that you close the file with fclose before returning.
 Image *readData(char *filename) 
 {
-	char format[10];
+	char format[3];
 	int col, row, max;
 	FILE* fp;
 	fp = fopen(filename, "r");
+	if (fp == NULL)
+	{
+		printf("Fail to open %s\n", filename);
+		return NULL;
+	}
+	Image *image = (Image*) malloc(sizeof(Image));
 	fscanf(fp, "%s\n", format);
-	fscanf(fp, "%d %d\n", &col, &row);
-	fscanf(fp, "%d\n", &max);
-	Color colors[row][col];
-	for (int i=0; i<row; i++) {
-		Color color;
-		for (int j=0; j<col; j++) {
-			fscanf(fp, "%d %d %d", &color.R, &color.G, &color.B);
-			colors[i][j] = color;
-		}
+	if (format[0] != 'P' || format[1] != '3') {
+		printf("Wrong format!\n");
+		return NULL;
+	}
+	fscanf(fp, "%u", &col);
+	fscanf(fp, "%u", &row);
+	fscanf(fp, "%u", &max);
+	image->image = (Color**) malloc(sizeof(Color*)*row*col);
+	for (int i=0; i<row*col; i++) 
+	{
+		*(image->image+i) = (Color*) malloc(sizeof(Color));
+		Color* pixel = *(image->image+i);
+		fscanf(fp, "%hhu %hhu %hhu", &pixel->R, &pixel->G, &pixel->B);	
 	}
 	fclose(fp);
-	Image image;
-	image.rows = row;
-	image.cols = col;
-	image.image = colors;
-	Image* image_ptr = &image;
-	return image_ptr;
+	image->rows = row;
+	image->cols = col;
+	return image;
 }
 
 //Given an image, prints to stdout (e.g. with printf) a .ppm P3 file with the image's data.
 void writeData(Image *image)
 {
-	//YOUR CODE HERE
+	printf("P3\n");
+	printf("%d %d\n", image->cols, image->rows);
+	printf("255\n");
+	Color** p = image->image;
+	for (int i = 0; i < image->rows; i++)
+	{
+		for (int j = 0; j < image->cols-1; j++)
+		{
+			printf("%3hhu %3hhu %3hhu   ", (*p)->R, (*p)->G, (*p)->B);
+			p++;
+		}
+		printf("%3hhu %3hhu %3hhu\n", (*p)->R, (*p)->G, (*p)->B);
+		p++;
+	}
 }
 
 //Frees an image
 void freeImage(Image *image)
 {
-	//YOUR CODE HERE
+	for (int i = 0; i < image->rows*image->cols; i++)
+	{
+		free(*(image->image+i));
+	}
+	free(image->image);
+	free(image);
 }
