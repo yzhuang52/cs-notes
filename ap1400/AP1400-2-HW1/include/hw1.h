@@ -1,3 +1,10 @@
+#include "iostream"
+#include "vector"
+#include "stdexcept"
+#include "random"
+
+
+
 #ifndef AP_HW1_H
 #define AP_HW1_H
 using Matrix = std::vector<std::vector<double>>;
@@ -47,7 +54,7 @@ Matrix inverse(const Matrix& matrix);
 
 // concatenate implement this function so that it will concatenate matrix1 and matrix2 along the specified axis. 
 // (axis=0: on top of each other | axis=1: alongside each other).
-Matrix concatenate(const Matrix& matrix1, const Matrix& matrix2, int axis=0);
+Matrix concatenate(const Matrix& matrix1, const Matrix& matrix2, int axis);
 
 // swap swaps r1th row with r2th.
 Matrix ero_swap(const Matrix& matrix, size_t r1, size_t r2);
