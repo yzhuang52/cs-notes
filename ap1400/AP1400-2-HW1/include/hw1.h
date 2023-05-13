@@ -2,7 +2,7 @@
 #include "vector"
 #include "stdexcept"
 #include "random"
-
+#include "iomanip"
 
 
 #ifndef AP_HW1_H
