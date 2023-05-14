@@ -279,15 +279,85 @@ Matrix concatenate(const Matrix& matrix1, const Matrix& matrix2, int axis) {
 }
 
 Matrix ero_swap(const Matrix& matrix, size_t r1, size_t r2) {
-    return zeros(1, 1);
+    if (r1 >= matrix.size() || r2 >= matrix.size())
+    {
+        throw std::logic_error("r1 or r2 out of range\n");
+    }
+    Matrix mat{zeros(matrix.size(), matrix[0].size())};
+    std::vector<double> temp;
+    for (int i = 0; i < matrix[0].size(); i++)
+    {
+        temp.push_back(matrix[r1][i]);
+    }
+    for (int i = 0; i < matrix.size(); i++)
+    {
+        for (int j = 0; j < matrix[0].size(); j++)
+        {
+            if (i == r1)
+            {
+                mat[i][j] = matrix[r2][j];
+            } else if (i == r2) 
+            {
+                mat[i][j] = temp[j];
+            } else 
+            {
+                mat[i][j] = matrix[i][j];
+            }
+        }
+    }
+    return mat;
 }
 
 Matrix ero_multiply(const Matrix& matrix, size_t r, double c) {
-    return zeros(1, 1);
+    if (matrix.size() == 0)
+    {
+        return matrix;
+    }
+    if (r >= matrix.size())
+    {
+        throw std::logic_error("r1 out of range\n");
+    }
+    Matrix mat{zeros(matrix.size(), matrix[0].size())};
+    for (int i = 0; i < matrix.size(); i++)
+    {
+        for (int j = 0; j < matrix[0].size(); j++)
+        {
+            if (i == r)
+            {
+                mat[i][j] = matrix[i][j] * c;
+            } else {
+                mat[i][j] = matrix[i][j];
+            }
+        }
+    }
+    return mat;
 }
 
 Matrix ero_sum(const Matrix& matrix, size_t r1, double c, size_t r2) {
-    return zeros(1, 1);
+    if (matrix.size() == 0)
+    {
+        return matrix;
+    }
+    if (r1 >= matrix.size() || r2 >= matrix.size())
+    {
+        throw std::logic_error("r1 or r2 out of range\n");
+    }
+    Matrix ero{ero_multiply(matrix, r1, c)};
+    Matrix mat{zeros(matrix.size(), matrix[0].size())};
+    for (int i = 0; i < matrix.size(); i++)
+    {
+        for (int j = 0; j < matrix[0].size(); j++)
+        {
+            if (i == r2)
+            {
+                mat[i][j] = matrix[i][j] + ero[r1][j];
+            } else 
+            {
+                mat[i][j] = matrix[i][j];
+            }
+        }
+    }
+    return mat;
 }
 
 Matrix upper_triangular(const Matrix& matrix) {
