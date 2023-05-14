@@ -5,13 +5,13 @@
 The following are HW checklists
 
 
-1. <span style="color:green"> HW1 - ***COMPLETED***</span> 😆
-2. <span style="color:red">HW2 - ***ONGOING*** </span>
-2. <span style="color:red">HW3 - ***ONGOING*** </span>
-2. <span style="color:red">HW4 - ***ONGOING*** </span>
-2. <span style="color:red">HW5 - ***ONGOING*** </span>
-2. <span style="color:red">HW6 - ***ONGOING*** </span>
-2. <span style="color:red">HW7 - ***ONGOING*** </span>
+1. ![#c5f015](https://placehold.co/15x15/c5f015/c5f015.png)  HW1 - ***COMPLETED*** 😆
+2. ![#f03c15](https://placehold.co/15x15/f03c15/f03c15.png) HW2 - ***ONGOING*** 
+3. ![#f03c15](https://placehold.co/15x15/f03c15/f03c15.png) HW3 - ***ONGOING*** 
+4. ![#f03c15](https://placehold.co/15x15/f03c15/f03c15.png) HW4 - ***ONGOING*** 
+5. ![#f03c15](https://placehold.co/15x15/f03c15/f03c15.png) HW5 - ***ONGOING*** 
+6. ![#f03c15](https://placehold.co/15x15/f03c15/f03c15.png) HW6 - ***ONGOING*** 
+7. ![#f03c15](https://placehold.co/15x15/f03c15/f03c15.png) HW7 - ***ONGOING*** 
 
 
 The goal of completing those assignments is to lay a solid foundation on C++ to prepare the learning of database, complier and network.
