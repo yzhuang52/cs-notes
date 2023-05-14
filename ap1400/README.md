@@ -4,13 +4,14 @@
 
 The following are HW checklists
 
-```diff
-+1. HW1 - ***COMPLETED*** :satisfied:
--2. HW2 - ***ONGOING*** 
--3. HW3 - ***ONGOING*** 
--4. HW4 - ***ONGOING*** 
--5. HW5 - ***ONGOING*** 
--6. HW6 - ***ONGOING*** 
--7. HW7 - ***ONGOING*** 
-```
+
+1. <span style="color:green"> HW1 - ***COMPLETED***</span> 😆
+2. <span style="color:red">HW2 - ***ONGOING*** </span>
+2. <span style="color:red">HW3 - ***ONGOING*** </span>
+2. <span style="color:red">HW4 - ***ONGOING*** </span>
+2. <span style="color:red">HW5 - ***ONGOING*** </span>
+2. <span style="color:red">HW6 - ***ONGOING*** </span>
+2. <span style="color:red">HW7 - ***ONGOING*** </span>
+
+
 The goal of completing those assignments is to lay a solid foundation on C++ to prepare the learning of database, complier and network.
