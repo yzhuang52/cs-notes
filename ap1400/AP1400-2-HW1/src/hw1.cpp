@@ -361,7 +361,20 @@ Matrix ero_sum(const Matrix& matrix, size_t r1, double c, size_t r2) {
 }
 
 Matrix upper_triangular(const Matrix& matrix) {
-    return zeros(1, 1);
+    if (matrix.size() == 0)
+    {
+        return matrix;
+    }
+    check_square(matrix);
+    Matrix mat = matrix;
+    for (int j = 0; j < matrix[0].size() - 1; j++)
+    {
+        for (int i = j + 1; i < matrix.size(); i++)
+        {
+            mat = ero_sum(mat, j, (((-1) * mat[i][j])/mat[j][j]), i);
+        }
+    }
+    return mat;
 }
 
 }
