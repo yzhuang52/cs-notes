@@ -182,15 +182,100 @@ Matrix minor(const Matrix& matrix, size_t n, size_t m) {
 }
 
 double determinant(const Matrix& matrix) {
-    return 1;
+    if (matrix.size() == 0) 
+    {
+        return 1;
+    }
+    check_square(matrix);
+    if (matrix.size() == 2) 
+    {
+        return matrix[0][0] * matrix[1][1] - matrix[0][1] * matrix[1][0];
+    }
+    double result = 0;
+    double sign = 1;
+    for (int i = 0; i < matrix[0].size(); i++)
+    {   
+        Matrix temp = minor(matrix, 0, i);
+        result += sign * matrix[0][i] * determinant(temp);
+        sign *= -1;
+    }
+    return result;
 }
 
 Matrix inverse(const Matrix& matrix) {
-    return zeros(1, 1);
+    if (matrix.size() == 0) 
+    {
+        return matrix;
+    }
+    check_square(matrix);
+    if (determinant(matrix) == 0) 
+    {
+        throw std::logic_error("Singular Matrix has no inverse\n");
+    }
+    int row = matrix.size();
+    int col = matrix[0].size();
+    Matrix inv{zeros(row, col)};
+    
+    for (int i = 0; i < row; i++)
+    {
+        for (int j = 0; j < col; j++)
+        {
+            double sign = (i + j) & 1 ? -1 : 1;
+            inv[i][j] = determinant(minor(matrix, i, j)) * sign;
+        }
+    }
+    inv = multiply(transpose(inv), (1/determinant(matrix)));
+    return inv;
 }
 
-Matrix concatenate(const Matrix& matrix1, const Matrix& matrix2, int axis=0) {
-    return zeros(1, 1);
+Matrix concatenate(const Matrix& matrix1, const Matrix& matrix2, int axis) {
+    if (axis == 0)
+    {
+        if (matrix1[0].size() != matrix2[0].size())
+        {
+            throw std::logic_error("wrong dimensions!\n");
+        }
+        Matrix mat{zeros(matrix1.size() + matrix2.size(), matrix1[0].size())};
+        for (int i = 0; i < mat.size(); i++)
+        {
+            for (int j = 0; j < mat[0].size(); j++)
+            {
+                if (i < matrix1.size())
+                {
+                    mat[i][j] = matrix1[i][j];
+                } else
+                {
+                    mat[i][j] = matrix2[i - matrix1.size()][j];
+                }
+            }
+        }
+        return mat;
+    } else if (axis == 1) 
+    {
+        if (matrix1.size() != matrix2.size())
+        {
+            throw std::logic_error("wrong dimensions!\n");
+        }
+        Matrix mat{zeros(matrix1.size(), matrix1[0].size() + matrix2[0].size())};
+        for (int i = 0; i < mat.size(); i++)
+        {
+            for (int j = 0; j < mat[0].size(); j++)
+            {
+                if (j < matrix1[0].size())
+                {
+                    mat[i][j] = matrix1[i][j];
+                }
+                else
+                {
+                    mat[i][j] = matrix2[i][j - matrix1[0].size()];
+                }   
+            }
+        }
+        return mat;
+    } else 
+    {
+        throw std::logic_error("axis not applicable!\n");
+    }
 }
 
 Matrix ero_swap(const Matrix& matrix, size_t r1, size_t r2) {

@@ -8,6 +8,10 @@ int main(int argc, char **argv)
     if (false) // make false to run unit-tests
     {
         // debug section
+        Matrix matrix1{algebra::random(2, 3, 0, 1)};
+        Matrix matrix2{algebra::random(4, 3, 0, 1)};
+        Matrix matrix{algebra::concatenate(matrix1, matrix2, 0)};
+        algebra::show(matrix);
     }
     else
     {
