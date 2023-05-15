@@ -1,6 +1,6 @@
 #  Amirkabir University of Technology 1400-2: Advanced Programming Course
 
-### AP1400 contains 7 programming assignments 
+### AP1400 contains 6 programming assignments for C++ 
 
 The following are HW checklists
 
@@ -11,7 +11,7 @@ The following are HW checklists
 4. ![#f03c15](https://placehold.co/15x15/f03c15/f03c15.png) HW4 - ***ONGOING*** 
 5. ![#f03c15](https://placehold.co/15x15/f03c15/f03c15.png) HW5 - ***ONGOING*** 
 6. ![#f03c15](https://placehold.co/15x15/f03c15/f03c15.png) HW6 - ***ONGOING*** 
-7. ![#f03c15](https://placehold.co/15x15/f03c15/f03c15.png) HW7 - ***ONGOING*** 
+
 
 
 The goal of completing those assignments is to lay a solid foundation on C++ to prepare the learning of database, complier and network.
