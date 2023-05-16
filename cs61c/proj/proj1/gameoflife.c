@@ -52,7 +52,29 @@ parseRule(rule, &live, &dead);
 //You should be able to copy most of this from steganography.c
 Image *life(Image *image, uint32_t rule)
 {
-	//YOUR CODE HERE
+	Image* nextImage =  malloc(sizeof(Image));
+	if (nextImage == NULL)
+	{
+		printf("malloc fail!\n");
+		exit(-1);
+	}
+	int totalPixels = image->rows * image->cols;
+	nextImage->image = malloc(totalPixels);
+	if (nextImage->image == NULL)
+	{
+		printf("malloc fail!\n");
+		exit(-1);
+	}
+	Color** p = im->image;
+	for (int i = 0; i < image->rows; i++)
+	{
+		for (int j = 0; j < image->cols; j++)
+		{
+			*(p) = evaluateOneCell(image, i, j, rule);
+			p++;
+		}
+	}
+	return nextImage;
 }
 
 /*
@@ -77,4 +99,12 @@ int main(int argc, char **argv)
 		printf("Wrong argument numbers!\n");
 		exit(-1);
 	}
+	Image* image = readData(argv[1]);
+	uint32_t rule = (uint32_t) strtol(argv[2], 0, 0);
+	Image* nextImage = life(image, rule);
+	writeData(nextImage);
+	freeImage(image);
+	freeImage(nextImage);
+	return 0;
+
 }
