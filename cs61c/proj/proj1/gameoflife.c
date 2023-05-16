@@ -17,12 +17,35 @@
 #include <inttypes.h>
 #include "imageloader.h"
 
-//Determines what color the cell at the given row/col should be. This function allocates space for a new Color.
-//Note that you will need to read the eight neighbors of the cell in question. The grid "wraps", so we treat the top row as adjacent to the bottom row
-//and the left column as adjacent to the right column.
+// Parse rule into live and dead array
+void parseRule(uint32_t rule, int** live, int** dead) {
+	int binaryNum[32];
+  
+    // counter for binary array
+    int i = 0;
+    while (rule > 0) {
+        // storing remainder in binary array
+        binaryNum[i] = rule % 2;
+        n = n / 2;
+        i++;
+    }
+	for (int i = 31; i > 0; i--)
+	{
+		
+	}
+
+}
+// Determines what color the cell at the given row/col should be. This function allocates space for a new Color.
+// Note that you will need to read the eight neighbors of the cell in question. The grid "wraps", so we treat the top row as adjacent to the bottom row
+// and the left column as adjacent to the right column.
 Color *evaluateOneCell(Image *image, int row, int col, uint32_t rule)
 {
-	//YOUR CODE HERE
+// change rule into binary form, extract live and dead into 2 array
+int live[9], dead[9];
+parseRule(rule, &live, &dead);
+// if live cell's live neighbors in live's array, be alive else dead
+// if dead cell's live neighbors in dead's array, be alive else dead
+
 }
 
 //The main body of Life; given an image and a rule, computes one iteration of the Game of Life.
@@ -49,5 +72,9 @@ You may find it useful to copy the code from steganography.c, to start.
 */
 int main(int argc, char **argv)
 {
-	//YOUR CODE HERE
+	if (argc != 3)
+	{
+		printf("Wrong argument numbers!\n");
+		exit(-1);
+	}
 }
