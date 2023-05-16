@@ -4,6 +4,7 @@
 
 The following are HW checklists
 
+## Homeworks (1/6)
 
 1. ![#c5f015](https://placehold.co/15x15/c5f015/c5f015.png)  HW1 - ***COMPLETED*** 😆
 2. ![#f03c15](https://placehold.co/15x15/f03c15/f03c15.png) HW2 - ***ONGOING*** 
