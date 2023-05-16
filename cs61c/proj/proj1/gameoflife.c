@@ -17,35 +17,49 @@
 #include <inttypes.h>
 #include "imageloader.h"
 
-// Parse rule into live and dead array
-void parseRule(uint32_t rule, int** live, int** dead) {
-	int binaryNum[32];
-  
-    // counter for binary array
-    int i = 0;
-    while (rule > 0) {
-        // storing remainder in binary array
-        binaryNum[i] = rule % 2;
-        n = n / 2;
-        i++;
-    }
-	for (int i = 31; i > 0; i--)
-	{
-		
-	}
-
+int dx[8] = {-1, -1, -1, 0, 0, 1, 1, 1};
+int dy[8] = {-1, 0, 1, -1, 1, -1, 0, 1};
+int ring(int m, int n)
+{
+	return (m + n) % n;
 }
 // Determines what color the cell at the given row/col should be. This function allocates space for a new Color.
 // Note that you will need to read the eight neighbors of the cell in question. The grid "wraps", so we treat the top row as adjacent to the bottom row
 // and the left column as adjacent to the right column.
 Color *evaluateOneCell(Image *image, int row, int col, uint32_t rule)
 {
-// change rule into binary form, extract live and dead into 2 array
-int live[9], dead[9];
-parseRule(rule, &live, &dead);
-// if live cell's live neighbors in live's array, be alive else dead
-// if dead cell's live neighbors in dead's array, be alive else dead
-
+Color* result = malloc(sizeof(Color));
+if (result == NULL)
+{
+	printf("malloc fail\n");
+	exit(-1);
+}
+int aliveNeighbor = 0;
+int isAlive = 0;
+Color* cell = *(image->image + row * image->cols + col);
+if (cell->R == 255 && cell->G == 255 && cell->B == 255)
+{
+	isAlive = 1;
+}
+for (int i = 0; i < 8; i++)
+{
+	int newRow = ring(row + dx[i], image->rows);
+	int newCol = ring(col + dy[i], image->cols);
+	Color* newCell = *(image->image + newRow * image->cols + newCol);
+	if (newCell->R == 255 && newCell->G == 255 && newCell->B == 255)
+	{
+		aliveNeighbor += 1;
+	}
+}
+int index = isAlive * 9 + aliveNeighbor;
+if (rule & (1<<index)) {
+	result->R = result->G = result->B = 255;
+	return result;
+} else 
+{
+	result->R = result->G = result->B = 0;
+	return result;
+}
 }
 
 //The main body of Life; given an image and a rule, computes one iteration of the Game of Life.
@@ -53,24 +67,26 @@ parseRule(rule, &live, &dead);
 Image *life(Image *image, uint32_t rule)
 {
 	Image* nextImage =  malloc(sizeof(Image));
+	nextImage->rows = image->rows;
+	nextImage->cols = image->cols;
 	if (nextImage == NULL)
 	{
 		printf("malloc fail!\n");
 		exit(-1);
 	}
 	int totalPixels = image->rows * image->cols;
-	nextImage->image = malloc(totalPixels);
+	nextImage->image = malloc(sizeof(Color*)*totalPixels);
 	if (nextImage->image == NULL)
 	{
 		printf("malloc fail!\n");
 		exit(-1);
 	}
-	Color** p = im->image;
+	Color** p = nextImage->image;
 	for (int i = 0; i < image->rows; i++)
 	{
 		for (int j = 0; j < image->cols; j++)
 		{
-			*(p) = evaluateOneCell(image, i, j, rule);
+			*p = evaluateOneCell(image, i, j, rule);
 			p++;
 		}
 	}
@@ -96,11 +112,11 @@ int main(int argc, char **argv)
 {
 	if (argc != 3)
 	{
-		printf("Wrong argument numbers!\n");
+		printf("usage: ./gameOfLife filename rule\nfilename is an ASCII PPM file (type P3) with maximum value 255.\nrule is a hex number beginning with 0x; Life is 0x1808.\n");
 		exit(-1);
 	}
 	Image* image = readData(argv[1]);
-	uint32_t rule = (uint32_t) strtol(argv[2], 0, 0);
+	uint32_t rule = (uint32_t) strtol(argv[2], NULL, 16);
 	Image* nextImage = life(image, rule);
 	writeData(nextImage);
 	freeImage(image);

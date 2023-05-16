@@ -32,13 +32,13 @@ Image *readData(char *filename)
 	if (fp == NULL)
 	{
 		printf("Fail to open %s\n", filename);
-		return NULL;
+		exit(-1);
 	}
 	Image *image = (Image*) malloc(sizeof(Image));
 	fscanf(fp, "%s\n", format);
 	if (format[0] != 'P' || format[1] != '3') {
 		printf("Wrong format!\n");
-		return NULL;
+		exit(-1);
 	}
 	fscanf(fp, "%u", &col);
 	fscanf(fp, "%u", &row);
