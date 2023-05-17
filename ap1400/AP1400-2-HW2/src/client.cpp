@@ -33,6 +33,6 @@ bool Client::transfer_money(std::string receiver, double value) const {
 }
 
 size_t Client::generate_nonce() {
-    return 1;
+    return rand();
 }
 

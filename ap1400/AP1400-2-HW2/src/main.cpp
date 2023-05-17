@@ -18,10 +18,25 @@ int main(int argc, char **argv)
     if (false) // make false to run unit-tests
     {
         Server server{};
-        auto bryan{server.add_client("bryan")};
-        auto clint{server.add_client("clint")};
-        bool valid{bryan->transfer_money("clint", 100)};
+    pending_trxs.clear();
+    auto bryan{server.add_client("bryan")};
+    auto clint{server.add_client("clint")};
+    auto sarah{server.add_client("sarah")};
+    EXPECT_TRUE(bryan->transfer_money("clint", 1));
+    EXPECT_TRUE(clint->transfer_money("sarah", 2.5));
+    EXPECT_TRUE(sarah->transfer_money("bryan", 0.5));
+
+    std::string mempool{};
+    for(const auto& trx : pending_trxs)
+        mempool += trx;
+        
+    show_wallets(server);
+    size_t nonce{server.mine()};
+    show_wallets(server);
+
+    std::string hash = crypto::sha256(mempool + std::to_string(nonce));
         // debug section
+    std::cout << hash << std::endl;
     }
     else
     {

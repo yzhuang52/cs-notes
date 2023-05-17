@@ -96,10 +96,33 @@ size_t Server::mine() {
     {
         mempool += trx;
     }
-    for (auto& it = this->clients.begin(); it != this.clients.end(); i++)
+    size_t nonce = 0;
+    bool flag = true;
+    while (flag)
     {
-        size_t nonce = (*it)->first->generate_nonce();
+        for (auto it = this->clients.begin(); it != this->clients.end(); it++)
+            {
+                nonce = (*it->first).generate_nonce();
+                if (crypto::sha256(mempool + std::to_string(nonce)).substr(0, 10).find("000") != std::string::npos)
+                {   
+                    std::cout << (*it->first).get_id() << std::endl;
+                    flag = false;
+                    it->second += 6.25;
+                    for (const auto& trx : pending_trxs)
+                    {
+                        std::string sender{}, receiver{};
+                        double value;
+                        Server::parse_trx(trx, sender, receiver, value);
+                        this->clients[this->get_client(sender)] -= value;
+                        this->clients[this->get_client(receiver)] += value;
+                    }
+                    pending_trxs.clear();
+                    return nonce;
+                }
+                
+            }
     }
+    return nonce;
 }
 
 
