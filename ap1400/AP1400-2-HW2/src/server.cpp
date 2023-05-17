@@ -8,7 +8,6 @@ Server::Server() {
 }
 
 std::shared_ptr<Client> Server::add_client(std::string id) {
-    std::shared_ptr<Client> client = std::make_shared<Client>(id, *this);
     for (auto it = this->clients.begin(); it != this->clients.end(); it++)
     {
         if ((*it->first).get_id() == id)
@@ -16,10 +15,12 @@ std::shared_ptr<Client> Server::add_client(std::string id) {
             // id in clients, add 4 random number
             int number = rand() % 9000 + 1000;
             id += std::to_string(number);
+            std::shared_ptr<Client> client = std::make_shared<Client>(id, *this);
             clients.insert({client, 5});
             return client;
         }
     }
+    std::shared_ptr<Client> client = std::make_shared<Client>(id, *this);
     clients.insert({client, 5});
     return client;
 }
@@ -47,15 +48,58 @@ double Server::get_wallet(std::string id) const {
 }
 
 bool Server::parse_trx(const std::string& trx, std::string& sender, std::string& receiver, double& value) {
-    return false;
+    std::string delimiter = "-";
+    size_t index = 0;
+    size_t pos = 0;
+    pos = trx.find(delimiter, index);
+    if (pos != std::string::npos)
+    {
+        sender = trx.substr(index, pos-index);
+        index = pos + 1;
+    } else 
+    {
+        throw std::runtime_error("non standard trx\n");
+    }
+    
+    pos = trx.find(delimiter, index);
+    if (pos != std::string::npos)
+    {
+        receiver = trx.substr(index, pos-index);
+        index = pos + 1;
+    } else 
+    {
+        throw std::runtime_error("non standard trx\n");
+    }
+    value = std::stod(trx.substr(index, trx.length() - 1));
+    return true;
+
 }
 
 bool Server::add_pending_trx(std::string trx, std::string signature) const {
+    
+    std::string sender{}, receiver{};
+    double value;
+    Server::parse_trx(trx, sender, receiver, value);
+    std::cout << value << std::endl;
+    bool authentic = crypto::verifySignature((*this->get_client(sender)).get_publickey(), trx, signature);
+    if(authentic && this->get_wallet(sender) >= value && this->get_client(receiver))
+    {
+        pending_trxs.push_back(trx);
+        return true;
+    }
     return false;
 }
 
 size_t Server::mine() {
-    return 1;
+    std::string mempool{};
+    for(const auto& trx: pending_trxs)
+    {
+        mempool += trx;
+    }
+    for (auto& it = this->clients.begin(); it != this.clients.end(); i++)
+    {
+        size_t nonce = (*it)->first->generate_nonce();
+    }
 }
 
 

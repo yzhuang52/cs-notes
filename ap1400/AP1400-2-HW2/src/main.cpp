@@ -17,6 +17,10 @@ int main(int argc, char **argv)
 {
     if (false) // make false to run unit-tests
     {
+        Server server{};
+        auto bryan{server.add_client("bryan")};
+        auto clint{server.add_client("clint")};
+        bool valid{bryan->transfer_money("clint", 100)};
         // debug section
     }
     else

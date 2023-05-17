@@ -22,11 +22,14 @@ double Client::get_wallet() const {
 }
 
 std::string Client::sign(std::string txt) const {
-    return txt;
+    std::string signature = crypto::signMessage(this->private_key, txt);
+    return signature;
 }
 
 bool Client::transfer_money(std::string receiver, double value) const {
-    return false;
+    std::string transaction = this->id + "-" + receiver + "-" + std::to_string(value);
+    std::string signature{this->sign(transaction)};
+    return this->server->add_pending_trx(transaction, signature);
 }
 
 size_t Client::generate_nonce() {
