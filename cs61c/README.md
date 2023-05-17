@@ -4,9 +4,9 @@
 
 The following are discussions, labs, projects checklists
 
-## Discussions (0/14)
+## Discussions (1/14)
 1. ![#f03c15](https://placehold.co/15x15/f03c15/f03c15.png) Disc1 &nbsp; - ***ONGOING***
-1. ![#f03c15](https://placehold.co/15x15/f03c15/f03c15.png) Disc2 &nbsp;  - ***ONGOING***
+1. ![#c5f015](https://placehold.co/15x15/c5f015/c5f015.png) Disc2 &nbsp;  - ***COMPLETED***
 1. ![#f03c15](https://placehold.co/15x15/f03c15/f03c15.png) Disc3 &nbsp;  - ***ONGOING***
 1. ![#f03c15](https://placehold.co/15x15/f03c15/f03c15.png) Disc4 &nbsp;  - ***ONGOING***
 1. ![#f03c15](https://placehold.co/15x15/f03c15/f03c15.png) Disc5 &nbsp;  - ***ONGOING***
@@ -34,7 +34,7 @@ The following are discussions, labs, projects checklists
 1. ![#f03c15](https://placehold.co/15x15/f03c15/f03c15.png) Lab11 - ***ONGOING***
 
 ## Projects (1/4)
-1. ![#c5f015](https://placehold.co/15x15/c5f015/c5f015.png) Proj1 - ***ONGOING*** 😆
+1. ![#c5f015](https://placehold.co/15x15/c5f015/c5f015.png) Proj1 - ***COMPLETED*** 😆
 1. ![#f03c15](https://placehold.co/15x15/f03c15/f03c15.png) Proj2 - ***ONGOING***
 1. ![#f03c15](https://placehold.co/15x15/f03c15/f03c15.png) Proj3 - ***ONGOING***
 1. ![#f03c15](https://placehold.co/15x15/f03c15/f03c15.png) Proj4 - ***ONGOING***
