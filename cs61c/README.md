@@ -20,9 +20,9 @@ The following are discussions, labs, projects checklists
 1. ![#f03c15](https://placehold.co/15x15/f03c15/f03c15.png) Disc13 - ***ONGOING***
 1. ![#f03c15](https://placehold.co/15x15/f03c15/f03c15.png) Disc14 - ***ONGOING***
 
-## Labs (1/11)
+## Labs (2/11)
 1. ![#c5f015](https://placehold.co/15x15/c5f015/c5f015.png) Lab1 &nbsp;  - ***COMPLETED***  😆
-1. ![#f03c15](https://placehold.co/15x15/f03c15/f03c15.png) Lab2 &nbsp;  - ***ONGOING***
+1. ![#c5f015](https://placehold.co/15x15/c5f015/c5f015.png) Lab2 &nbsp;  - ***ONGOING***  😆
 1. ![#f03c15](https://placehold.co/15x15/f03c15/f03c15.png) Lab3 &nbsp;  - ***ONGOING***
 1. ![#f03c15](https://placehold.co/15x15/f03c15/f03c15.png) Lab4 &nbsp;  - ***ONGOING***
 1. ![#f03c15](https://placehold.co/15x15/f03c15/f03c15.png) Lab5 &nbsp;  - ***ONGOING***
