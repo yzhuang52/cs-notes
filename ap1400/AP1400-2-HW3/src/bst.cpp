@@ -88,7 +88,7 @@ std::size_t BST::length() const {
 }
 
 bool BST::add_node(int value) {
-    return 1;
+    return true;
 }
 
 BST::Node** BST::find_node(int value) const {
@@ -112,14 +112,14 @@ std::ostream& operator<<(std::ostream& out, BST& bst) {
     return out;
 }
 
-void operator=(BST& bst1, BST& bst2) {
-    bst1.root = bst2.root;
+BST& BST::operator=(BST& bst) {
+    this.root = bst.root;
+    return *this;
 }
 
-void operator=(BST& bst1, BST&& bst2) {
-    bst1.root = bst2.root;
+BST& operator=(BST&& bst) {
+    this.root = bst2.root;
+    return *this;
 }
-
-
 
 
