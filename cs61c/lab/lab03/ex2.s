@@ -71,3 +71,11 @@ exit:
     addi sp, sp, 20
     # END EPILOGUE
     jr ra
+
+# 1. k is stored in t0(x5)
+# 2. sum is stored in s0(x8)
+# 3. source pointer is stored at s1(x9), dest pointer is stored at s2(x18)
+# 4. The loop part is in the loop symbol
+# 5. the start address of source is stored at s1, the value of k is stored in t0
+# the asm code use t2 = s1 + s3(k << 2) to get the address of source[k]
+# and use 0(t2) to load the value in source[k]

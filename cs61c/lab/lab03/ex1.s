@@ -21,3 +21,8 @@ finish:
     ecall # print integer ecall
     addi a0, x0, 10
     ecall # terminate ecall
+
+# 1. .text is the source code, .data is the section to hold variable .word hold a variable of 8
+# 2. The output number is 34, meaning Fib(9)
+# 3. n is stored at 0x10000008
+# 4. just change the number of n to 13
