@@ -55,7 +55,6 @@ main:
 # FIXME Fix the reported error in this function (you can delete lines
 # if necessary, as long as the function still returns 1 in a0).
 simple_fn:
-    mv a0, t0
     li a0, 1
     ret
 
@@ -76,6 +75,8 @@ simple_fn:
 # missing. Another hint: what does the "s" in "s0" stand for?
 naive_pow:
     # BEGIN PROLOGUE
+    addi sp sp -4
+    sw s0 0(sp)
     # END PROLOGUE
     li s0, 1
 naive_pow_loop:
@@ -86,6 +87,8 @@ naive_pow_loop:
 naive_pow_end:
     mv a0, s0
     # BEGIN EPILOGUE
+    lw s0 0(sp)
+    addi sp sp 4
     # END EPILOGUE
     ret
 
@@ -100,8 +103,11 @@ inc_arr:
     #
     # FIXME What other registers need to be saved?
     #
-    addi sp, sp, -4
+    addi sp, sp, -16
     sw ra, 0(sp)
+    sw s0, 4(sp)
+    sw s1, 8(sp)
+    sw a0, 12(sp)
     # END PROLOGUE
     mv s0, a0 # Copy start of array to saved register
     mv s1, a1 # Copy length of array to saved register
@@ -116,14 +122,21 @@ inc_arr_loop:
     # Hint: What does the "t" in "t0" stand for?
     # Also ask yourself this: why don't we need to preserve t1?
     #
+    addi sp sp -4
+    sw t0 0(sp)
     jal helper_fn
     # Finished call for helper_fn
+    lw t0 0(sp)
+    addi sp sp 4
     addi t0, t0, 1 # Increment counter
     j inc_arr_loop
 inc_arr_end:
     # BEGIN EPILOGUE
     lw ra, 0(sp)
-    addi sp, sp, 4
+    lw s0, 4(sp)
+    lw s1, 8(sp)
+    lw a0, 12(sp)
+    addi sp, sp, 16
     # END EPILOGUE
     ret
 
@@ -138,9 +151,9 @@ inc_arr_end:
 helper_fn:
     # BEGIN PROLOGUE
     # END PROLOGUE
-    lw t1, 0(a0)
-    addi s0, t1, 1
-    sw s0, 0(a0)
+    lw t0, 0(a0)
+    addi t1, t0, 1
+    sw t1, 0(a0)
     # BEGIN EPILOGUE
     # END EPILOGUE
     ret
