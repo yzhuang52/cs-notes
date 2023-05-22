@@ -4,12 +4,12 @@
 
 The following are HW checklists
 
-## Homeworks (3/6)
+## Homeworks (4/6)
 
 1. ![#c5f015](https://placehold.co/15x15/c5f015/c5f015.png)  HW1 - ***COMPLETED*** 😆
 2. ![#c5f015](https://placehold.co/15x15/c5f015/c5f015.png) HW2 - ***COMPLETED*** 😆
 3. ![#c5f015](https://placehold.co/15x15/c5f015/c5f015.png) HW3 - ***COMPLETED***  😆
-4. ![#f03c15](https://placehold.co/15x15/f03c15/f03c15.png) HW4 - ***ONGOING*** 
+4. ![#c5f015](https://placehold.co/15x15/c5f015/c5f015.png) HW4 - ***COMPLETED***  😆
 5. ![#f03c15](https://placehold.co/15x15/f03c15/f03c15.png) HW5 - ***ONGOING*** 
 6. ![#f03c15](https://placehold.co/15x15/f03c15/f03c15.png) HW6 - ***ONGOING*** 
 

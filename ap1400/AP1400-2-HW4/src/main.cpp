@@ -5,8 +5,12 @@
 
 int main(int argc, char **argv)
 {
-    if (true) // make false to run unit-tests
+    if (false) // make false to run unit-tests
     {
+        SharedPtr<int> ptr1{};
+
+        SharedPtr<std::string> ptr2{};
+        
         // debug section 
         
     }
