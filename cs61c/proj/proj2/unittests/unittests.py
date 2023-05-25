@@ -452,12 +452,10 @@ class TestClassify(TestCase):
         t.call("classify")
         # generate assembly and pass program arguments directly to venus
         t.execute(args=args)
-
         # compare the output file and
-        raise NotImplementedError("TODO")
-        # TODO
+        t.check_file_output(out_file, ref_file)
         # compare the classification output with `check_stdout`
-
+        t.check_stdout("8")
     @classmethod
     def tearDownClass(cls):
         print_coverage("classify.s", verbose=False)

@@ -37,8 +37,8 @@ classify:
     # matmul(m1, (*m1_rows), (*m1_cols), layer1, (*m0_rows), (*input_cols), layer2);
     # return argmax(layer2, (*m1_rows) * (*m0_cols));
     li t0, 5
-    bne a0, to, exit_89
-    addi sp, sp, -40
+    bne a0, t0, exit_89
+    addi sp, sp, -52
     sw ra, 0(sp)
     sw s0, 4(sp)
     sw s1, 8(sp)
@@ -49,6 +49,9 @@ classify:
     sw s6, 28(sp)
     sw s7, 32(sp)
     sw s8, 36(sp)
+    sw s9, 40(sp)
+    sw s10, 44(sp)
+    sw s11, 48(sp)
 	# =====================================
     # LOAD MATRICES
     # =====================================
@@ -126,7 +129,7 @@ classify:
     sw a0, 0(sp)
     sw a1, 4(sp)
     sw a2, 8(sp)
-    lw a0, 0(a1)
+    lw a0, 4(a1)
     mv a1, s0
     mv a2, s1
     jal read_matrix 
@@ -141,7 +144,7 @@ classify:
     sw a0, 0(sp)
     sw a1, 4(sp)
     sw a2, 8(sp)
-    lw a0, 0(a1)
+    lw a0, 8(a1)
     mv a1, s2
     mv a2, s3
     jal read_matrix 
@@ -152,11 +155,11 @@ classify:
     addi sp, sp, 12
 
     # Load input matrix
-     addi sp, sp, -12
+    addi sp, sp, -12
     sw a0, 0(sp)
     sw a1, 4(sp)
     sw a2, 8(sp)
-    lw a0, 0(a1)
+    lw a0, 12(a1)
     mv a1, s4
     mv a2, s5
     jal read_matrix 
@@ -232,34 +235,80 @@ classify:
     jal relu
     lw a0, 0(sp)
     lw a1, 4(sp)
+    addi sp, sp, 8
+
+    # layer2 = m1 * layer1
+    # matmul(m1, (*m1_rows), (*m1_cols), layer1, (*m0_rows), (*input_cols), layer2);
     
+    addi sp, sp, -12
+    sw a0, 0(sp)
+    sw a1, 4(sp)
+    sw a2, 8(sp)
+    mv a0, s7 
+    lw a1, 0(s2)
+    lw a2, 0(s3)
+    mv a3, s9
+    lw a4, 0(s0)
+    lw a5, 0(s5)
+    mv a6, s10
+    jal matmul 
+    lw a0, 0(sp)
+    lw a1, 4(sp)
+    lw a2, 8(sp) 
+
      
     # =====================================
     # WRITE OUTPUT
     # =====================================
     # Write output matrix
 
-
-
-
+    addi sp, sp, 12
+    sw a0, 0(sp)
+    sw a1, 4(sp)
+    sw a2, 8(sp)
+    lw a0, 16(a1)
+    mv a1, s10 
+    lw a2, 0(s0)
+    lw a3, 0(s5)
+    jal write_matrix
+    lw a0, 0(sp)
+    lw a1, 4(sp)
+    lw a2, 8(sp)
 
     # =====================================
     # CALCULATE CLASSIFICATION/LABEL
     # =====================================
     # Call argmax
 
-
-
-
+    # argmax(layer2, (*m1_rows) * (*m0_cols));
+    addi sp, sp, -12
+    sw a0, 0(sp)
+    sw a1, 4(sp)
+    sw a2, 8(sp)
+    lw t0, 0(s0)
+    lw t1, 0(s5)
+    mul t1, t1, t0
+    mv a1, t1 
+    mv a0, s10
+    jal argmax 
+    mv s11, a0 # s11 store the classification result
+    lw a0, 0(sp)
+    lw a1, 4(sp)
+    lw a2, 8(sp)
+    addi sp, sp, 12
     # Print classification
-    
-
+    beq a2, x0, exit
+    mv a1, s11
+    jal print_int
 
 
     # Print newline afterwards for clarity
+    li a1, '\n'
+    li a0, 11
+    ecall 
+exit: 
 
-
-
+    mv a0, s11
     lw ra, 0(sp)
     lw s0, 4(sp)
     lw s1, 8(sp)
@@ -270,7 +319,10 @@ classify:
     lw s6, 28(sp)
     lw s7, 32(sp)
     lw s8, 36(sp)
-    addi, sp, sp, 40
+    lw s9, 40(sp)
+    lw s10, 44(sp)
+    lw s11, 48(sp)
+    addi, sp, sp, 52
     ret
 
 exit_88:
@@ -280,3 +332,4 @@ exit_88:
 exit_89:
     li a1, 89
     j exit2
+
