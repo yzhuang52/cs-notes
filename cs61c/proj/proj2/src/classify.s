@@ -60,7 +60,7 @@ classify:
     # input_rows -> s4, input_cols -> s5 
     addi sp, sp, -8
     sw a0, 0(sp)
-    sw a1, 0(sp)
+    sw a1, 4(sp)
     li a0, 4
     jal malloc 
     beq a0, x0, exit_88
@@ -71,7 +71,7 @@ classify:
 
     addi sp, sp, -8
     sw a0, 0(sp)
-    sw a1, 0(sp)
+    sw a1, 4(sp)
     li a0, 4
     jal malloc 
     beq a0, x0, exit_88
@@ -82,7 +82,7 @@ classify:
 
     addi sp, sp, -8
     sw a0, 0(sp)
-    sw a1, 0(sp)
+    sw a1, 4(sp)
     li a0, 4
     jal malloc 
     beq a0, x0, exit_88
@@ -93,7 +93,7 @@ classify:
 
     addi sp, sp, -8
     sw a0, 0(sp)
-    sw a1, 0(sp)
+    sw a1, 4(sp)
     li a0, 4
     jal malloc 
     beq a0, x0, exit_88
@@ -104,7 +104,7 @@ classify:
 
     addi sp, sp, -8
     sw a0, 0(sp)
-    sw a1, 0(sp)
+    sw a1, 4(sp)
     li a0, 4
     jal malloc 
     beq a0, x0, exit_88
@@ -115,7 +115,7 @@ classify:
 
     addi sp, sp, -8
     sw a0, 0(sp)
-    sw a1, 0(sp)
+    sw a1, 4(sp)
     li a0, 4
     jal malloc 
     beq a0, x0, exit_88
