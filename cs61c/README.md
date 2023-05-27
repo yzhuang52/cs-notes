@@ -4,12 +4,12 @@
 
 The following are discussions, labs, projects checklists
 
-## Discussions (2/14)
+## Discussions (3/14)
 1. ![#f03c15](https://placehold.co/15x15/f03c15/f03c15.png) Disc1 &nbsp; - ***ONGOING***
 1. ![#c5f015](https://placehold.co/15x15/c5f015/c5f015.png) Disc2 &nbsp;  - ***COMPLETED***  😆
 1. ![#f03c15](https://placehold.co/15x15/f03c15/f03c15.png) Disc3 &nbsp;  - ***ONGOING***
 1. ![#c5f015](https://placehold.co/15x15/c5f015/c5f015.png) Disc4 &nbsp;  - ***COMPLETED***  😆
-1. ![#f03c15](https://placehold.co/15x15/f03c15/f03c15.png) Disc5 &nbsp;  - ***ONGOING***
+1. ![#c5f015](https://placehold.co/15x15/c5f015/c5f015.png) Disc5 &nbsp;  - ***COMPLETED***  😆
 1. ![#f03c15](https://placehold.co/15x15/f03c15/f03c15.png) Disc6 &nbsp;  - ***ONGOING***
 1. ![#f03c15](https://placehold.co/15x15/f03c15/f03c15.png) Disc7 &nbsp;  - ***ONGOING***
 1. ![#f03c15](https://placehold.co/15x15/f03c15/f03c15.png) Disc8 &nbsp;  - ***ONGOING***
@@ -47,4 +47,4 @@ Anyway, don't skip any lab or discussion (I give myself a pass on disc1 and disc
 
 ### Part1 C Programming (disc2, lab1, lab2, proj1)
 
-### Part2 RISC-V (disc4, disc5, lab4, lab5, proj2)
+### Part2 RISC-V (disc4, disc5, lab3, lab4, proj2)
