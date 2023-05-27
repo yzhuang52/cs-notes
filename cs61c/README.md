@@ -42,9 +42,18 @@ The following are discussions, labs, projects checklists
 ✋It will be really helpful to finish related lab and discussion before starting project. The content of discussion will help you correct misunderstands about certain topic, and the skills you learn on lab is useful in project. </br>
 Anyway, don't skip any lab or discussion (I give myself a pass on disc1 and disc3, those disc contain number repersentation that I'm not interested😝) 
 
-## Notes
-#### This course contains 4 parts and I will take notes after I finish each part 
+## Summary
+#### This course contains 4 parts and I will write summary after I finish each part 
 
 ### Part1 C Programming (disc2, lab1, lab2, proj1)
+**_Disc2_** contains basic C Programming knowledge like bitwise operations, pointer and dynamically memory allocation </br>
+**_Lab1_** introduces gcc, gdb debugging and valgrind </br>
+**_Lab2_** has programming assignments for topics in Disc2 </br>
+**_Proj1_** will implement animation of [The Game of Life](https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life) </br>
+The input of this program is 1. game rule (encoded as a hexidecimal number) 2. input file name (ppm file) </br>
+Then the program will write next stage of game to stdout </br>
+The following is proj1 logic
+
+
 
 ### Part2 RISC-V (disc4, disc5, lab3, lab4, proj2)
