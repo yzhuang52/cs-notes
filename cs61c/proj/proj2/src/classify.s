@@ -184,12 +184,13 @@ classify:
     li t2, 4
     mul t2, t2, t0
     mul t2, t2, t1
-    mv t2, a0
+    mv a0, t2
     jal malloc 
     beq a0, x0, exit_88
     mv s9, a0 # s9 holds pointer to layer1
     lw a0, 0(sp)
     lw a1, 4(sp)
+    addi sp, sp, 8
 
     addi sp, sp, -8
     sw a0, 0(sp)
@@ -199,21 +200,22 @@ classify:
     li t2, 4
     mul t2, t2, t0
     mul t2, t2, t1
-    mv t2, a0
+    mv a0, t2
     jal malloc 
     beq a0, x0, exit_88
     mv s10, a0 # s10 holds pointer to layer2
     lw a0, 0(sp)
     lw a1, 4(sp)
+    addi sp, sp, 8
 
-    # layer1 = m0 * m1
+    # layer1 = m0 * input
     addi sp, sp, -12
     sw a0, 0(sp)
     sw a1, 4(sp)
     sw a2, 8(sp)
     mv a0, s6 
-    lw a1, 0(s1)
-    lw a2, 0(s2)
+    lw a1, 0(s0)
+    lw a2, 0(s1)
     mv a3, s8
     lw a4, 0(s4)
     lw a5, 0(s5)
@@ -222,7 +224,8 @@ classify:
     lw a0, 0(sp)
     lw a1, 4(sp)
     lw a2, 8(sp) 
-    
+    addi sp, sp, 12
+
     # call relu
     addi sp, sp, -8
     sw a0, 0(sp)
@@ -255,14 +258,14 @@ classify:
     lw a0, 0(sp)
     lw a1, 4(sp)
     lw a2, 8(sp) 
-
+    addi sp, sp, 12
      
     # =====================================
     # WRITE OUTPUT
     # =====================================
     # Write output matrix
 
-    addi sp, sp, 12
+    addi sp, sp, -12
     sw a0, 0(sp)
     sw a1, 4(sp)
     sw a2, 8(sp)
@@ -274,7 +277,7 @@ classify:
     lw a0, 0(sp)
     lw a1, 4(sp)
     lw a2, 8(sp)
-
+    addi sp, sp, 12
     # =====================================
     # CALCULATE CLASSIFICATION/LABEL
     # =====================================
@@ -296,10 +299,12 @@ classify:
     lw a1, 4(sp)
     lw a2, 8(sp)
     addi sp, sp, 12
+    
     # Print classification
-    beq a2, x0, exit
+    bne a2, x0, exit
     mv a1, s11
-    jal print_int
+    li a0 11
+    ecall
 
 
     # Print newline afterwards for clarity
@@ -307,6 +312,30 @@ classify:
     li a0, 11
     ecall 
 exit: 
+    # free allocated space
+    mv a0, s0
+    jal free
+    mv a0, s1
+    jal free
+    mv a0, s2
+    jal free
+    mv a0, s3
+    jal free
+    mv a0, s4
+    jal free
+    mv a0, s5
+    jal free
+    mv a0, s6
+    jal free
+    mv a0, s7
+    jal free
+    mv a0, s8
+    jal free
+    mv a0, s9
+    jal free
+    mv a0, s10
+    jal free
+
 
     mv a0, s11
     lw ra, 0(sp)
@@ -332,4 +361,5 @@ exit_88:
 exit_89:
     li a1, 89
     j exit2
+
 
