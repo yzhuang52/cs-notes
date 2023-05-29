@@ -4,13 +4,13 @@
 
 The following are discussions, labs, projects checklists
 
-## Discussions (3/14)
+## Discussions (4/14)
 1. ![#f03c15](https://placehold.co/15x15/f03c15/f03c15.png) Disc1 &nbsp; - ***ONGOING***
 1. ![#c5f015](https://placehold.co/15x15/c5f015/c5f015.png) Disc2 &nbsp;  - ***COMPLETED***  😆
 1. ![#f03c15](https://placehold.co/15x15/f03c15/f03c15.png) Disc3 &nbsp;  - ***ONGOING***
 1. ![#c5f015](https://placehold.co/15x15/c5f015/c5f015.png) Disc4 &nbsp;  - ***COMPLETED***  😆
 1. ![#c5f015](https://placehold.co/15x15/c5f015/c5f015.png) Disc5 &nbsp;  - ***COMPLETED***  😆
-1. ![#f03c15](https://placehold.co/15x15/f03c15/f03c15.png) Disc6 &nbsp;  - ***ONGOING***
+1. ![#c5f015](https://placehold.co/15x15/c5f015/c5f015.png) Disc6 &nbsp;  - ***COMPLETED*** 😆
 1. ![#f03c15](https://placehold.co/15x15/f03c15/f03c15.png) Disc7 &nbsp;  - ***ONGOING***
 1. ![#f03c15](https://placehold.co/15x15/f03c15/f03c15.png) Disc8 &nbsp;  - ***ONGOING***
 1. ![#f03c15](https://placehold.co/15x15/f03c15/f03c15.png) Disc9 &nbsp; - ***ONGOING***
@@ -39,8 +39,8 @@ The following are discussions, labs, projects checklists
 1. ![#f03c15](https://placehold.co/15x15/f03c15/f03c15.png) Proj3 - ***ONGOING***
 1. ![#f03c15](https://placehold.co/15x15/f03c15/f03c15.png) Proj4 - ***ONGOING***
 
-✋It will be really helpful to finish related lab and discussion before starting project. The content of discussion will help you correct misunderstands about certain topic, and the skills you learn on lab is useful in project. </br>
-Anyway, don't skip any lab or discussion (I give myself a pass on disc1 and disc3, those disc contain number repersentation that I'm not interested😝) 
+✋It will be really helpful to finish related lab and discussion before starting project. The content of discussion will help you correct misunderstandings of concepts, and the skills you learn on lab will be useful when doing project. </br>
+Anyway, don't skip any lab or discussion (I give myself a pass on disc1 and disc3, those discs contain number repersentation that I'm not interested😝) 
 
 ## Summary
 #### This course contains 4 parts and I will write summary after I finish each part 
