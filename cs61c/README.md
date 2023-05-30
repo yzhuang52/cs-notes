@@ -2,7 +2,7 @@
 
 ## CS 61C contains 14 discussions, 11 homeworks, 11 labs and 4 projects. Homeworks are blocked 
 
-The following are discussions, labs, projects checklists
+The followings are discussions, labs, projects checklists
 
 ## Discussions (4/14)
 1. ![#f03c15](https://placehold.co/15x15/f03c15/f03c15.png) Disc1 &nbsp; - ***ONGOING***
@@ -20,12 +20,12 @@ The following are discussions, labs, projects checklists
 1. ![#f03c15](https://placehold.co/15x15/f03c15/f03c15.png) Disc13 - ***ONGOING***
 1. ![#f03c15](https://placehold.co/15x15/f03c15/f03c15.png) Disc14 - ***ONGOING***
 
-## Labs (4/11)
+## Labs (5/11)
 1. ![#c5f015](https://placehold.co/15x15/c5f015/c5f015.png) Lab1 &nbsp;  - ***COMPLETED***  😆
 1. ![#c5f015](https://placehold.co/15x15/c5f015/c5f015.png) Lab2 &nbsp;  - ***COMPLETED***  😆
 1. ![#c5f015](https://placehold.co/15x15/c5f015/c5f015.png) Lab3 &nbsp;  - ***COMPLETED*** 😆
 1. ![#c5f015](https://placehold.co/15x15/c5f015/c5f015.png) Lab4 &nbsp;  - ***COMPLETED*** 😆
-1. ![#f03c15](https://placehold.co/15x15/f03c15/f03c15.png) Lab5 &nbsp;  - ***ONGOING***
+1. ![#c5f015](https://placehold.co/15x15/c5f015/c5f015.png) Lab5 &nbsp;  - ***COMPLETED*** 😆
 1. ![#f03c15](https://placehold.co/15x15/f03c15/f03c15.png) Lab6 &nbsp;  - ***ONGOING***
 1. ![#f03c15](https://placehold.co/15x15/f03c15/f03c15.png) Lab7 &nbsp;  - ***ONGOING***
 1. ![#f03c15](https://placehold.co/15x15/f03c15/f03c15.png) Lab8 &nbsp;  - ***ONGOING***
