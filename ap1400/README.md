@@ -10,8 +10,8 @@ The following are HW checklists
 2. ![#c5f015](https://placehold.co/15x15/c5f015/c5f015.png) HW2 - ***COMPLETED*** 😆
 3. ![#c5f015](https://placehold.co/15x15/c5f015/c5f015.png) HW3 - ***COMPLETED***  😆
 4. ![#c5f015](https://placehold.co/15x15/c5f015/c5f015.png) HW4 - ***COMPLETED***  😆
-5. ![#f03c15](https://placehold.co/15x15/f03c15/f03c15.png) HW5 - ***ONGOING*** 
-6. ![#f03c15](https://placehold.co/15x15/f03c15/f03c15.png) HW6 - ***ONGOING*** 
+5. ![#1589F0](https://placehold.co/15x15/1589F0/1589F0.png) HW5 - ***PAUSED***  😑
+6. ![#1589F0](https://placehold.co/15x15/1589F0/1589F0.png) HW6 - ***PAUSED***  😑
 
 
 
