@@ -10,6 +10,9 @@ public:
     }
 
     virtual std::string get_name() {return this->name;}
+    virtual Cinnamon* clone() override {
+        return new Cinanmon(*this);
+    }
 };
 
 class Chocolate
@@ -21,6 +24,9 @@ public:
     }
 
     virtual std::string get_name() {return this->name;}
+    virtual Chocolate* clone() override {
+        return new Cinanmon(*this);
+    }
 };
 
 class Sugar
@@ -32,6 +38,9 @@ public:
     }
 
     virtual std::string get_name() {return this->name;}
+    virtual Sugar* clone() override {
+        return new Cinanmon(*this);
+    }
 };
 
 class Cookie
@@ -43,6 +52,9 @@ public:
     }
 
     virtual std::string get_name() {return this->name;}
+    virtual Cookie* clone() override {
+        return new Cookie(*this);
+    }
 };
 
 class Espresso
@@ -54,6 +66,9 @@ public:
     }
 
     virtual std::string get_name() {return this->name;}
+    virtual Espresso* clone() override {
+        return new Espresso(*this);
+    }
 };
 
 class Milk
@@ -65,6 +80,9 @@ public:
     }
 
     virtual std::string get_name() {return this->name;}
+    virtual Milk* clone() override {
+        return new Milk(*this);
+    }
 };
 
 class MilkFoam
@@ -76,6 +94,9 @@ public:
     }
 
     virtual std::string get_name() {return this->name;}
+    virtual MilkFoam* clone() override {
+        return new MilkFoam(*this);
+    }
 };
 
 class Water
@@ -87,5 +108,8 @@ public:
     }
 
     virtual std::string get_name() {return this->name;}
+    virtual Water* clone() override {
+        return new Water(*this);
+    }
 };
 #endif // SUB_INGREDIENTS_H

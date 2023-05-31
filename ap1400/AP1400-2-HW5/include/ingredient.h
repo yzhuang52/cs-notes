@@ -15,6 +15,7 @@ public:
         return price_unit * units;
     }
     
+    virtual Ingredient* clone() = 0;
 
 protected:
     Ingredient(double price_unit, size_t units): price_unit(price_unit), units(units) {}
