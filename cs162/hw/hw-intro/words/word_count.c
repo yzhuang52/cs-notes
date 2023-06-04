@@ -37,8 +37,12 @@ int init_words(WordCount **wclist) {
      Returns 0 if no errors are encountered
      in the body of this function; 1 otherwise.
   */
-  *wclist = NULL;
-  return 0;
+  *wclist = malloc(sizeof(WordCount));
+  if (wclist == NULL)
+  {
+    return 0;
+  }
+  return 1;
 }
 
 ssize_t len_words(WordCount *wchead) {
