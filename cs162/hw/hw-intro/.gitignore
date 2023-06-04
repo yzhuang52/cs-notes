@@ -2,3 +2,4 @@ limits
 map
 words/words
 !wc_sort.o
+.tags
