@@ -75,6 +75,28 @@ int num_words(FILE* infile) {
  * and 0 otherwise.
  */
 int count_words(WordCount **wclist, FILE *infile) {
+  char c;
+  char word[MAX_WORD_LEN + 1];
+  int index = 0;
+  do 
+  {
+    c = (char) fgetc(infile);
+    if (feof(infile))
+    {
+      break;
+    }
+    while (isalpha(c))
+    {
+      word[index] = c;
+      index += 1;
+    }
+    for (int i = index; i < MAX_WORD_LEN; i++)
+    {
+      word[i] = 0;
+    }
+    index = 0;
+    add_word(wclist, word);
+  } while(1);
   return 0;
 }
 
@@ -83,7 +105,13 @@ int count_words(WordCount **wclist, FILE *infile) {
  * Useful function: strcmp().
  */
 static bool wordcount_less(const WordCount *wc1, const WordCount *wc2) {
-  return 0;
+  if (strcmp(wc1->word, wc2->word) < 0) 
+  {
+    return true;
+  } else 
+  {
+    return false;
+  }
 }
 
 // In trying times, displays a helpful message.
@@ -148,6 +176,7 @@ int main (int argc, char *argv[]) {
     
     infile = stdin;
     total_words += num_words(infile);
+    count_words(&word_counts, infile);
   } else {
     // At least one file specified. Useful functions: fopen(), fclose().
     // The first file can be found at argv[optind]. The last file can be
@@ -161,6 +190,8 @@ int main (int argc, char *argv[]) {
         return 1;
       }
       total_words += num_words(infile);
+      count_words(&word_counts, infile);
+      fclose(infile);
     }
   }
   if (count_mode) {

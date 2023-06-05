@@ -37,12 +37,17 @@ int init_words(WordCount **wclist) {
      Returns 0 if no errors are encountered
      in the body of this function; 1 otherwise.
   */
-  *wclist = malloc(sizeof(WordCount));
+  wclist = malloc(sizeof(WordCount*));
   if (wclist == NULL)
   {
-    return 0;
+    return 1;
   }
-  return 1;
+  *wclist = malloc(sizeof(WordCount));
+  if (*wclist == NULL)
+  {
+    return 1;
+  }
+  return 0;
 }
 
 ssize_t len_words(WordCount *wchead) {
@@ -51,12 +56,28 @@ ssize_t len_words(WordCount *wchead) {
      this function.
   */
     size_t len = 0;
+    WordCount* ptr = wchead;
+    while (ptr != NULL)
+    {
+      len += 1;
+      ptr = ptr->next;
+    }
     return len;
 }
 
 WordCount *find_word(WordCount *wchead, char *word) {
   /* Return count for word, if it exists */
   WordCount *wc = NULL;
+  WordCount* ptr = wchead;
+  while (ptr != NULL)
+  {
+    if (strcmp(ptr->word, word) == 0)
+    {
+      wc = ptr;
+      break;
+    }
+    ptr = ptr->next;
+  }
   return wc;
 }
 
@@ -65,7 +86,29 @@ int add_word(WordCount **wclist, char *word) {
      Otherwise insert with count 1.
      Returns 0 if no errors are encountered in the body of this function; 1 otherwise.
   */
- return 0;
+  WordCount* ptr = *wclist;
+  while (ptr->next != NULL)
+  {
+    if (strcmp(ptr->word, word) == 0)
+    {
+      // word exists, update count
+      ptr->count += 1;
+      break;
+    } 
+    ptr = ptr->next;
+  }
+  if (ptr->next == NULL)
+  {
+    // word not exists, insert into wclist
+    ptr->next = malloc(sizeof(WordCount));
+    if (ptr->next == NULL)
+    {
+      return 0;
+    }
+    ptr->next->word = word;
+    ptr->next->count = 1;
+  }
+  return 0;
 }
 
 void fprint_words(WordCount *wchead, FILE *ofile) {
