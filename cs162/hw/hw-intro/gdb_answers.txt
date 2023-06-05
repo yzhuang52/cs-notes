@@ -1,0 +1,78 @@
+1. Run GDB on the map executable.
+A: gdb map 
+
+2. Set a breakpoint at the beginning of the program’s execution.
+A: break 16
+
+3. Run the program until the breakpoint.
+A: run
+
+4. What memory address does argv store?
+A: print argv 
+
+5. Describe what’s located at that memory address. (What does argv point to?)
+A: a pointer point to a char array
+
+6. Step until you reach the first call to recur
+A. next 3
+
+7. What is the memory address of the recur function?
+A: print recur 
+
+8. Step into the first call to recur.
+A: step 
+
+9. Step until you reach the if statement.
+A: next
+
+10. Switch into assembly view.
+A: layout asm 
+
+11. Step over instructions until you reach the callq instruction (or the call instruction if you are using QEMU).
+A: stepi 
+
+12. What values are in all the registers?
+A: info registers
+
+13. Step into the callq instruction.
+A: si 
+
+14. Switch back to C code mode.
+A: layout src 
+
+15. Now print out the current call stack. Hint: what does the backtrace command do?
+A: backtrace 1
+
+16. Now set a breakpoint on the recur function which is only triggered when the argument is 0.
+A: break recur if i=0
+
+17. Continue until the breakpoint is hit.
+A: continue 
+
+18. Print the call stack now.
+A: backtrace 1
+
+19. Now go up the call stack until you reach main. What was argc?
+A: frame 4  argc==1
+
+20. Now step until the return statement in recur.
+A: s 
+
+21. Switch back into the assembly view.
+A: layout asm 
+
+22. Which instructions correspond to the return 0 in C?
+A: mov $0x0, %eax 
+
+23. Now switch back to the source layout.
+A: layout src 
+
+24. Finish the remaining 3 function calls.
+A: finish 
+
+25. Run the program to completion.
+A: continue 
+
+26. Quit GDB.
+A: exit 
+
