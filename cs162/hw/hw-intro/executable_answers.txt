@@ -1,0 +1,54 @@
+1. Generate recurse.S and find which instruction(s) corresponds to the recursive call of recur(i - 1).
+A: call	recur
+
+2. What do the .text and .data sections contain?
+A: .text contains instructions, .data contains non-zero, read-write data 
+
+3. What command do we use to view the symbols in an ELF file? (Hint: We can use objdump again, look at man objdump to find the right flag).
+A: objdump --syms map.o 
+
+4. What do the g, O, F, and *UND* flags mean?
+A: g means the symbol is globol, O means the symbol is an object, F means the symbol is a function, *UND* means the section is referenced in the file being dumped
+   but not defined here 
+
+5. Where else can we find a symbol for recur? Which file is this in? Copy and paste the relevant portion of the symbol table.
+A: recurse.S 
+0000000000000000 <recur>:
+   0:   f3 0f 1e fa             endbr64
+   4:   55                      push   %rbp
+   5:   48 89 e5                mov    %rsp,%rbp
+   8:   48 83 ec 10             sub    $0x10,%rsp
+   c:   89 7d fc                mov    %edi,-0x4(%rbp)
+   f:   8b 45 fc                mov    -0x4(%rbp),%eax
+  12:   48 8d 55 fc             lea    -0x4(%rbp),%rdx
+  16:   89 c6                   mov    %eax,%esi
+  18:   48 8d 05 00 00 00 00    lea    0x0(%rip),%rax        # 1f <recur+0x1f>
+  1f:   48 89 c7                mov    %rax,%rdi
+  22:   b8 00 00 00 00          mov    $0x0,%eax
+  27:   e8 00 00 00 00          call   2c <recur+0x2c>
+  2c:   8b 45 fc                mov    -0x4(%rbp),%eax
+  2f:   85 c0                   test   %eax,%eax
+  31:   7e 0f                   jle    42 <recur+0x42>
+  33:   8b 45 fc                mov    -0x4(%rbp),%eax
+  36:   83 e8 01                sub    $0x1,%eax
+  39:   89 c7                   mov    %eax,%edi
+  3b:   e8 00 00 00 00          call   40 <recur+0x40>
+  40:   eb 05                   jmp    47 <recur+0x47>
+  42:   b8 00 00 00 00          mov    $0x0,%eax
+  47:   c9                      leave
+  48:   c3                      ret
+
+6. Examine the symbol table of the entire map program now. What has changed?
+A: everything changed 
+
+7. What segment(s)/section(s) contains recur (the function)? (The address of recur in objdump will not be exactly the same as what you saw in gdb. An optional stretch exercise is to think about why.)
+A: .text 
+
+8. What segment(s)/section(s) contains global variables?
+A: .bss 
+
+9. Do you see the stack segment anywhere? What about the heap? Explain.
+A: Not see stack, not see heap 
+
+10. Based on the output of map, in which direction does the stack grow? Explain.
+A: grow down 
