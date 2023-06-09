@@ -11,8 +11,8 @@ The followings are homeworks and projects checklists
 1. ![#f03c15](https://placehold.co/15x15/f03c15/f03c15.png) HW4 - ***ONGOING***
 1. ![#f03c15](https://placehold.co/15x15/f03c15/f03c15.png) HW5 - ***ONGOING***
 
-## Projects (0/5)
-1. ![#f03c15](https://placehold.co/15x15/f03c15/f03c15.png) Proj1 - ***ONGOING*** 
+## Projects (1/5)
+1. ![#c5f015](https://placehold.co/15x15/c5f015/c5f015.png) Proj1 - ***COMPLETED*** 
 1. ![#f03c15](https://placehold.co/15x15/f03c15/f03c15.png) Proj2 - ***ONGOING*** 
 1. ![#f03c15](https://placehold.co/15x15/f03c15/f03c15.png) Proj3 - ***ONGOING***
 1. ![#f03c15](https://placehold.co/15x15/f03c15/f03c15.png) Proj4 - ***ONGOING***
