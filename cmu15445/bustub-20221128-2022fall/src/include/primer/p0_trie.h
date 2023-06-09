@@ -286,6 +286,7 @@ class Trie {
     if (key.empty()) {
       return false;
     }
+    latch_.WLock();
     TrieNode* ptr = root_.get();
     for (int i = 0; i < static_cast<int>(key.length()) - 1; i++) {
       if (!ptr->HasChild(key[i])) {
@@ -303,8 +304,10 @@ class Trie {
       ptr->RemoveChildNode(key.back());
       ptr->InsertChildNode(key.back(), std::move(value_node));
     } else {
+      latch_.WUnlock();
       return false;
     }
+    latch_.WUnlock();
     return true;
   }
 
@@ -326,11 +329,42 @@ class Trie {
    * @return True if the key exists and is removed, false otherwise
    */
   bool Remove(const std::string &key) { 
-    return false;
+    if (key.empty()) {
+      return false;
+    }
+    latch_.WLock();
+    std::stack<std::pair<char, TrieNode*>> st;
+    auto ptr = root_.get();
+    for (char k: key) {
+      if (ptr->GetChildNode(k) == nullptr) {
+        latch_.WUnlock();
+        return false;
+      }
+      st.push({k, ptr});
+      ptr = ptr->GetChildNode(k)->get();
+    }
+    if (!ptr->IsEndNode()) {
+      latch_.WUnlock();
+      return false;
+    }
+    ptr->SetEndNode(false);
+    if (ptr->HasChildren()) {
+      latch_.WUnlock();
+      return true;
+    }
+    while (st.empty()) {
+      auto &[key_char, parent] = st.top();
+      if (parent->GetChildNode(key_char)->get()->HasChildren() || parent->GetChildNode(key_char)->get()->IsEndNode()) {
+        break;
+      }
+      parent->RemoveChildNode(key_char);
+      st.pop();
+    }
+    latch_.WUnlock();
+    return true;
   }
 
   /**
-   * TODO(P0): Add implementation
    *
    * @brief Get the corresponding value of type T given its key.
    * If key is empty, set success to false.
@@ -353,24 +387,29 @@ class Trie {
       *success = false;
       return {};
     }
+    latch_.RLock();
     TrieNode* ptr = root_.get();
     for (int i = 0; i < static_cast<int>(key.length()); i++) {
       if (!ptr->HasChild(key[i])) {
         *success = false;
+        latch_.RUnlock();
         return {};
       }
       ptr = ptr->GetChildNode(key[i])->get();
     }
     if (ptr->IsEndNode() == false) {
       *success = false;
+      latch_.RUnlock();
       return {};
     }
     auto last = dynamic_cast<TrieNodeWithValue<T>*>(ptr);
     if (last == nullptr) {
       *success = false;
+      latch_.RUnlock();
       return {};
     }
     *success = true;
+    latch_.RUnlock();
     return last->GetValue();
   }
 };
