@@ -67,7 +67,7 @@ class TrieNode {
    * @param key_char Key char of child node.
    * @return True if this trie node has a child with given key, false otherwise.
    */
-  bool HasChild(char key_char) const { return children_.count(key_char) != 0; }
+  auto HasChild(char key_char) const -> bool { return children_.count(key_char) != 0; }
 
   /**
    *
@@ -76,7 +76,7 @@ class TrieNode {
    *
    * @return True if this trie node has any child node, false if it has no child node.
    */
-  bool HasChildren() const { return !children_.empty(); }
+  auto HasChildren() const -> bool { return !children_.empty(); }
 
   /**
    *
@@ -84,7 +84,7 @@ class TrieNode {
    *
    * @return True if is_end_ flag is true, false if is_end_ is false.
    */
-  bool IsEndNode() const { return is_end_; }
+  auto IsEndNode() const -> bool { return is_end_; }
 
   /**
    *
@@ -92,7 +92,7 @@ class TrieNode {
    *
    * @return key_char_ of this trie node.
    */
-  char GetKeyChar() const { return key_char_; }
+  auto GetKeyChar() const -> char { return key_char_; }
 
   /**
    *
@@ -112,7 +112,7 @@ class TrieNode {
    * @param child Unique pointer created for the child node. This should be added to children_ map.
    * @return Pointer to unique_ptr of the inserted child node. If insertion fails, return nullptr.
    */
-  std::unique_ptr<TrieNode> *InsertChildNode(char key_char, std::unique_ptr<TrieNode> &&child) { 
+  auto InsertChildNode(char key_char, std::unique_ptr<TrieNode> &&child) -> std::unique_ptr<TrieNode> * {
     if (children_.count(key_char) != 0 || child->GetKeyChar() != key_char) {
       return nullptr;
     }
@@ -129,7 +129,7 @@ class TrieNode {
    * @return Pointer to unique_ptr of the child node, nullptr if child
    *         node does not exist.
    */
-  std::unique_ptr<TrieNode> *GetChildNode(char key_char) { 
+  auto GetChildNode(char key_char) -> std::unique_ptr<TrieNode> * {
     if (!HasChild(key_char)) {
       return nullptr;
     }
@@ -231,7 +231,7 @@ class TrieNodeWithValue : public TrieNode {
    *
    * @return Value of type T stored in this node
    */
-  T GetValue() const { return value_; }
+  auto GetValue() const -> T { return value_; }
 };
 
 /**
@@ -282,7 +282,7 @@ class Trie {
    * @return True if insertion succeeds, false if the key already exists
    */
   template <typename T>
-  bool Insert(const std::string &key, T value) {
+  auto Insert(const std::string &key, T value) -> bool {
     if (key.empty()) {
       return false;
     }
@@ -295,12 +295,16 @@ class Trie {
       ptr = ptr->GetChildNode(key[i])->get();
     }
     if (!ptr->HasChild(key.back())) {
+      // no terminal value, insert a TrieNode then convert it to TrieNodeWithValue
       ptr->InsertChildNode(key.back(), std::make_unique<TrieNode>(TrieNode(key.back())));
-      auto value_node = std::make_unique<TrieNodeWithValue<T>>(std::move(*(ptr->GetChildNode(key.back()))->get()), value);
+      auto value_node =
+      std::make_unique<TrieNodeWithValue<T>>(std::move(**ptr->GetChildNode(key.back())), value);
       ptr->RemoveChildNode(key.back());
       ptr->InsertChildNode(key.back(), std::move(value_node));
-    } else if (ptr->HasChild(key.back()) && (*(ptr->GetChildNode(key.back())))->IsEndNode() == false) {
-      auto value_node = std::make_unique<TrieNodeWithValue<T>>(std::move(*(ptr->GetChildNode(key.back()))->get()), value);
+    } else if (ptr->HasChild(key.back()) && !(*(ptr->GetChildNode(key.back())))->IsEndNode()) {
+      // has terminal value, but not a TrieNodeWithValue, converion happenes
+      auto value_node =
+      std::make_unique<TrieNodeWithValue<T>>(std::move(**ptr->GetChildNode(key.back())), value);
       ptr->RemoveChildNode(key.back());
       ptr->InsertChildNode(key.back(), std::move(value_node));
     } else {
@@ -328,14 +332,14 @@ class Trie {
    * @param key Key used to traverse the trie and find the correct node
    * @return True if the key exists and is removed, false otherwise
    */
-  bool Remove(const std::string &key) { 
+  auto Remove(const std::string &key) -> bool {
     if (key.empty()) {
       return false;
     }
     latch_.WLock();
     std::stack<std::pair<char, TrieNode*>> st;
     auto ptr = root_.get();
-    for (char k: key) {
+    for (char k : key) {
       if (ptr->GetChildNode(k) == nullptr) {
         latch_.WUnlock();
         return false;
@@ -382,22 +386,22 @@ class Trie {
    * @return Value of type T if type matches
    */
   template <typename T>
-  T GetValue(const std::string &key, bool *success) {
+  auto GetValue(const std::string &key, bool *success) -> T {
     if (key.empty()) {
       *success = false;
       return {};
     }
     latch_.RLock();
     TrieNode* ptr = root_.get();
-    for (int i = 0; i < static_cast<int>(key.length()); i++) {
-      if (!ptr->HasChild(key[i])) {
+    for (char i : key) {
+      if (!ptr->HasChild(i)) {
         *success = false;
         latch_.RUnlock();
         return {};
       }
-      ptr = ptr->GetChildNode(key[i])->get();
+      ptr = ptr->GetChildNode(i)->get();
     }
-    if (ptr->IsEndNode() == false) {
+    if (!ptr->IsEndNode()) {
       *success = false;
       latch_.RUnlock();
       return {};
