@@ -20,18 +20,22 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+
+
+#include "list.h"
 #ifndef PINTOS_LIST
 #error "PINTOS_LIST must be #define'd when compiling word_count_l.c"
 #endif
-
 #include "word_count.h"
 
-void init_words(word_count_list_t* wclist) { /* TODO */
+
+void init_words(word_count_list_t* wclist) { 
+  list_init(wclist);
+  return;
 }
 
 size_t len_words(word_count_list_t* wclist) {
-  /* TODO */
-  return 0;
+  return list_size(wclist);
 }
 
 word_count_t* find_word(word_count_list_t* wclist, char* word) {
