@@ -28,6 +28,13 @@
 #endif
 #include "word_count.h"
 
+char *new_string(char *str) {
+  char *new_str = (char *) malloc(strlen(str) + 1);
+  if (new_str == NULL) {
+    return NULL;
+  }
+  return strcpy(new_str, str);
+}
 
 void init_words(word_count_list_t* wclist) { 
   list_init(wclist);
@@ -41,7 +48,7 @@ size_t len_words(word_count_list_t* wclist) {
 word_count_t* find_word(word_count_list_t* wclist, char* word) {
   struct list_elem *e;
   for (e = list_begin(wclist); e != list_end(wclist); e = list_next(e)) {
-    struct word_count_t * wc = list_entry(e, struct word_count_t, wc->elem);
+    word_count_t* wc = list_entry(e, word_count_t, elem);
     if (strcmp(wc->word, word) == 0) {
       return wc;
     }
@@ -52,18 +59,42 @@ word_count_t* find_word(word_count_list_t* wclist, char* word) {
 word_count_t* add_word(word_count_list_t* wclist, char* word) {
   struct list_elem *e = list_begin(wclist);
   int flag = 0;
-  struct word_count_t *wc = list_entry(e, struct foo, wclist->elem);
+  word_count_t* wc;
   for (e = list_begin(wclist); e != list_end(wclist); e = list_next(e)) {
-
+    wc = list_entry(e, word_count_t, elem);
+    if (strcmp(wc->word, word) == 0) {
+      // word in word_count update word_count
+      wc->count += 1;
+      flag = 1;
+    }
   }
-  return NULL;
+  if (flag == 0) {
+    // word not in word_count, insert it
+    wc = malloc(sizeof(word_count_t));
+    wc->count = 1;
+    wc->word = new_string(word);
+    list_insert(list_end(wclist), &wc->elem);
+  }
+  return wc;
 }
 
-void fprint_words(word_count_list_t* wclist, FILE* outfile) { /* TODO */
+void fprint_words(word_count_list_t* wclist, FILE* outfile) { 
+  struct list_elem* e;
+  for(e = list_begin(wclist); e != list_end(wclist); e = e->next) {
+    word_count_t* node = list_entry(e, word_count_t, elem);
+    fprintf(outfile, "%8d\t%s\n", node->count, node->word);
+  }
 }
 
 static bool less_list(const struct list_elem* ewc1, const struct list_elem* ewc2, void* aux) {
-  /* TODO */
+  word_count_t* word1 = list_entry(ewc1, word_count_t, elem);
+  word_count_t* word2 = list_entry(ewc2, word_count_t, elem);
+  if(word1->count < word2->count) {
+    return true;
+  } else if(word1->count == word2->count) {
+    if(strcmp(word1->word, word2->word) <= 0)
+      return true;
+  }
   return false;
 }
 

@@ -35,16 +35,49 @@
 /*
  * main - handle command line, spawning one thread per file.
  */
+
+word_count_list_t word_counts;
+
+
+void* threadfunc(void* filename) {
+  FILE* infile = fopen((char*)filename, "r");
+  if (infile == NULL) {
+      fprintf(stderr, "File not exists!\n");
+      exit(-1);
+  }
+  printf("%s is being processed\n", (char*)filename);
+  count_words(&word_counts, infile);
+  fclose(infile);
+  pthread_exit(NULL);
+}
+
 int main(int argc, char* argv[]) {
   /* Create the empty data structure. */
-  word_count_list_t word_counts;
   init_words(&word_counts);
 
   if (argc <= 1) {
     /* Process stdin in a single thread. */
     count_words(&word_counts, stdin);
   } else {
-    /* TODO */
+    init_words(&word_counts);
+    int nthreads = argc - 1;
+    pthread_t threads[nthreads];
+    int rc;
+    for (int t = 0; t < nthreads; t++) {
+      rc = pthread_create(&threads[t], NULL, threadfunc, (void*)argv[t+1]);
+      if (rc) {
+        printf("ERROR; return code from pthread_create() is %d\n", rc);
+        exit(-1);
+      }
+    }
+    for (int i = 0; i < nthreads; i++) {
+      rc = pthread_join(threads[i], NULL);
+      if (rc) {
+        printf("ERROR; return code from pthread_join() is %d\n", rc);
+        exit(-1);
+      }
+    }
+    
   }
 
   /* Output final result of all threads' work. */

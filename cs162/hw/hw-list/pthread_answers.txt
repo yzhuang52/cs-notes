@@ -1,0 +1,14 @@
+1. Is the program’s output the same each time it is run? Why or why not?
+A: The program's output are not the same each time it runs. Because the OS can run, suspend, or resume a thread at any time 
+
+2. Based on the program’s output, do multiple threads share the same stack?
+A: No, each thread has its own stack frame
+
+3. Based on the program’s output, do multiple threads have separate copies of global variables?
+A: Yes, multiple threads share global variables 
+
+4. Based on the program’s output, what is the value of void *threadid? How does this relate to the variable’s type (void *)?
+A: The value of void* threadid is the value of void* t
+
+5. Using the first command line argument, create a large number of threads in pthread. Do all threads run before the program exits? Why or why not?
+A: No, I create 10000 threads and only 9991 of them returns. I think this it bacause the main thread doesn't wait until all threads return. 
