@@ -39,12 +39,23 @@ size_t len_words(word_count_list_t* wclist) {
 }
 
 word_count_t* find_word(word_count_list_t* wclist, char* word) {
-  /* TODO */
+  struct list_elem *e;
+  for (e = list_begin(wclist); e != list_end(wclist); e = list_next(e)) {
+    struct word_count_t * wc = list_entry(e, struct word_count_t, wc->elem);
+    if (strcmp(wc->word, word) == 0) {
+      return wc;
+    }
+  }
   return NULL;
 }
 
 word_count_t* add_word(word_count_list_t* wclist, char* word) {
-  /* TODO */
+  struct list_elem *e = list_begin(wclist);
+  int flag = 0;
+  struct word_count_t *wc = list_entry(e, struct foo, wclist->elem);
+  for (e = list_begin(wclist); e != list_end(wclist); e = list_next(e)) {
+
+  }
   return NULL;
 }
 
