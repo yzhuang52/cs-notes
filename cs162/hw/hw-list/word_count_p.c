@@ -37,8 +37,10 @@ char *new_string(char *str) {
   return strcpy(new_str, str);
 }
 
-void init_words(word_count_list_t* wclist) { 
+void init_words(word_count_list_t* wclist) {
+  pthread_mutex_lock(&wclist->lock);
   list_init(wclist);
+  pthread_mutex_unlock(&wclist->lock);
   return;
 }
 
@@ -61,6 +63,7 @@ word_count_t* add_word(word_count_list_t* wclist, char* word) {
   struct list_elem *e = list_begin(wclist);
   int flag = 0;
   word_count_t* wc;
+  pthread_mutex_lock(&wclist->lock);
   for (e = list_begin(wclist); e != list_end(wclist); e = list_next(e)) {
     wc = list_entry(e, word_count_t, elem);
     if (strcmp(wc->word, word) == 0) {
@@ -76,6 +79,7 @@ word_count_t* add_word(word_count_list_t* wclist, char* word) {
     wc->word = new_string(word);
     list_insert(list_end(wclist), &wc->elem);
   }
+  pthread_mutex_unlock(&wclist->lock);
   return wc;
 }
 
