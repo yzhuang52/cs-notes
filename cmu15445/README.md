@@ -1,11 +1,11 @@
-# CMU 15445 (Database Systems) Spring 2023
+# CMU 15445 (Database Systems) Fall 2022
 
 ## CMU 15445 contains 5 homeworks and 5 projects. 
 
 The followings are homeworks and projects checklists
 
-## Homeworks (0/5)
-1. ![#f03c15](https://placehold.co/15x15/f03c15/f03c15.png) HW1 - ***ONGOING*** 
+## Homeworks (1/5)
+1. ![#c5f015](https://placehold.co/15x15/c5f015/c5f015.png) HW1 - ***COMPLETED*** 
 1. ![#f03c15](https://placehold.co/15x15/f03c15/f03c15.png) HW2 - ***ONGOING*** 
 1. ![#f03c15](https://placehold.co/15x15/f03c15/f03c15.png) HW3 - ***ONGOING***
 1. ![#f03c15](https://placehold.co/15x15/f03c15/f03c15.png) HW4 - ***ONGOING***
