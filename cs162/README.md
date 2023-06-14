@@ -4,11 +4,11 @@
 
 The followings are discussions, HWs, Labects checklists
 
-## Discussions (3/11)
+## Discussions (4/11)
 1. ![#c5f015](https://placehold.co/15x15/c5f015/c5f015.png) Disc0 &nbsp; - ***COMPLETED***
 1. ![#c5f015](https://placehold.co/15x15/c5f015/c5f015.png) Disc1 &nbsp;  - ***COMPLETED***  
 1. ![#c5f015](https://placehold.co/15x15/c5f015/c5f015.png) Disc2 &nbsp;  - ***COMPLETED***
-1. ![#f03c15](https://placehold.co/15x15/f03c15/f03c15.png) Disc3 &nbsp;  - ***ONGOING***
+1. ![#c5f015](https://placehold.co/15x15/c5f015/c5f015.png) Disc3 &nbsp;  - ***COMPLETED***
 1. ![#f03c15](https://placehold.co/15x15/f03c15/f03c15.png) Disc4 &nbsp;  - ***ONGOING***  
 1. ![#f03c15](https://placehold.co/15x15/f03c15/f03c15.png) Disc5 &nbsp;  - ***ONGOING***
 1. ![#f03c15](https://placehold.co/15x15/f03c15/f03c15.png) Disc6 &nbsp;  - ***ONGOING***
@@ -32,4 +32,4 @@ The followings are discussions, HWs, Labects checklists
 1. ![#f03c15](https://placehold.co/15x15/f03c15/f03c15.png) Lab2 - ***ONGOING*** 
 1. ![#f03c15](https://placehold.co/15x15/f03c15/f03c15.png) Lab3a - ***ONGOING***
 1. ![#f03c15](https://placehold.co/15x15/f03c15/f03c15.png) Lab3b - ***ONGOING***
-1. ![#f03c15](https://placehold.co/15x15/f03c15/f03c15.png) Lab5 - ***ONGOING***
+1. ![#f03c15](https://placehold.co/15x15/f03c15/f03c15.png) Lab4 - ***ONGOING***
