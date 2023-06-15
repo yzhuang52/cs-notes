@@ -34,7 +34,8 @@ static struct thread* idle_thread;
 /* Initial thread, the thread running init.c:main(). */
 static struct thread* initial_thread;
 
-/* Lock used by allocate_tid(). */
+/* Lock used by allocate_
+tid(). */
 static struct lock tid_lock;
 
 /* Stack frame for kernel_thread(). */

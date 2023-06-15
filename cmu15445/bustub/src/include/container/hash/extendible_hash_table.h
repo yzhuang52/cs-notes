@@ -22,7 +22,7 @@
 #include <mutex>  // NOLINT
 #include <utility>
 #include <vector>
-
+#include "hash_function.h"
 #include "container/hash/hash_table.h"
 
 namespace bustub {
@@ -125,7 +125,6 @@ class ExtendibleHashTable : public HashTable<K, V> {
 
     /**
      *
-     * TODO(P1): Add implementation
      *
      * @brief Find the value associated with the given key in the bucket.
      * @param key The key to be searched.
@@ -136,7 +135,6 @@ class ExtendibleHashTable : public HashTable<K, V> {
 
     /**
      *
-     * TODO(P1): Add implementation
      *
      * @brief Given the key, remove the corresponding key-value pair in the bucket.
      * @param key The key to be deleted.
@@ -146,7 +144,6 @@ class ExtendibleHashTable : public HashTable<K, V> {
 
     /**
      *
-     * TODO(P1): Add implementation
      *
      * @brief Insert the given key-value pair into the bucket.
      *      1. If a key already exists, the value should be updated.
