@@ -133,7 +133,29 @@ pintos_init (void)
     /* Run actions specified on kernel command line. */
     run_actions (argv);
   } else {
-    // TODO: no command line passed to kernel. Run interactively 
+    // TODO: no command line passed to kernel. Run interactively
+    console_init();
+    input_init();
+    while (1) {
+      printf("PKUOS>");
+      char line[64];
+      size_t count = 0;
+      char c;
+      while ( (c = (char) input_getc()) != 13 && count < 63) {
+        putchar(c);
+        line[count++] = c;
+      }
+      printf("\n");
+      line[count] = '\0';
+      if (!strcmp(line, "exit")) {
+        break;
+      } else if (!strcmp(line, "whoami")) {
+        printf("UW Madison Student\n");
+      } else {
+        printf("Invalid command!\n");
+      }
+    }
+    printf("exit\n");
   }
 
   /* Finish up. */
