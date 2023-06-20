@@ -84,16 +84,29 @@ timer_elapsed (int64_t then)
   return timer_ticks () - then;
 }
 
+// Busy Waiting
+// void
+// timer_sleep (int64_t ticks) 
+// {
+//   int64_t start = timer_ticks ();
+
+//   ASSERT (intr_get_level () == INTR_ON);
+//   while (timer_elapsed (start) < ticks) 
+//     thread_yield ();
+// }
 /** Sleeps for approximately TICKS timer ticks.  Interrupts must
    be turned on. */
+   
 void
 timer_sleep (int64_t ticks) 
 {
   int64_t start = timer_ticks ();
-
+  struct semaphore* sema = malloc(sizeof(struct semaphore));
+  sema_init(sema, 0);
+  sema_down(sema);
   ASSERT (intr_get_level () == INTR_ON);
   while (timer_elapsed (start) < ticks) 
-    thread_yield ();
+    sema_up(sema);
 }
 
 /** Sleeps for approximately MS milliseconds.  Interrupts must be
