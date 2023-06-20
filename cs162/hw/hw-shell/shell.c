@@ -131,8 +131,21 @@ int main(unused int argc, unused char* argv[]) {
     if (fundex >= 0) {
       cmd_table[fundex].fun(tokens);
     } else {
-      /* REPLACE this to run commands as programs. */
-      fprintf(stdout, "This shell doesn't know how to run programs.\n");
+      size_t argv_length = tokens_get_length(tokens) + 1;
+      char** prog_argv = malloc(argv_length);
+      for(int i = 0; i < argv_length - 1; i++) {
+        prog_argv[i] = tokens_get_token(tokens, i);
+      }
+      prog_argv[argv_length - 1] = NULL;
+      pid_t pid = fork();
+      int flag;
+      if (pid != 0) {
+        wait(&flag);
+      }
+      if (pid == 0) {
+        execv(prog_argv[0], prog_argv);
+        exit(0);
+      }
     }
 
     if (shell_is_interactive)
