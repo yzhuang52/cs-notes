@@ -138,9 +138,31 @@ int main(unused int argc, unused char* argv[]) {
       struct stat stat_buffer;
       size_t argv_length = tokens_get_length(tokens) + 1;
       char* prog_argv[argv_length];
+      int save_stdin = dup(0);
+      int save_stdout = dup(1);
+      int fd;
       for(int i = 0; i < argv_length - 1; i++) {
         char* token = tokens_get_token(tokens, i);
-        prog_argv[i] = token;
+        if (strcmp(token, "<") == 0) {
+          // change stdin to specified file
+          if ((fd = open(tokens_get_token(tokens, i + 1), O_RDONLY)) < 0) {
+            exit(0);
+          }
+          argv_length -= 2;
+          dup2(fd, 0);
+          break;
+        } else if (strcmp(token, ">") == 0) {
+          // change stdout to specified file
+          if ((fd = open(tokens_get_token(tokens, i + 1), O_CREAT|O_TRUNC|O_RDWR, 0644)) < 0) {
+            exit(0);
+          }
+          argv_length -= 2;
+          fflush(stdout);
+          dup2(fd, 1);
+          break;
+        } else {
+          prog_argv[i] = token;
+        }
       }
       prog_argv[argv_length - 1] = NULL;
       int flag;
@@ -162,6 +184,11 @@ int main(unused int argc, unused char* argv[]) {
         execv(prog_argv[0], prog_argv);
         exit(0);
       }
+      close(fd);
+      dup2(save_stdin, 0);
+      dup2(save_stdout, 1);
+      close(save_stdin);
+      close(save_stdout);
     }
 
     if (shell_is_interactive)
