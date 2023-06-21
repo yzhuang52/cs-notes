@@ -137,20 +137,20 @@ int main(unused int argc, unused char* argv[]) {
       char *rest = NULL;
       struct stat stat_buffer;
       size_t argv_length = tokens_get_length(tokens) + 1;
-      char** prog_argv = malloc(argv_length);
+      char* prog_argv[argv_length];
       for(int i = 0; i < argv_length - 1; i++) {
-        prog_argv[i] = tokens_get_token(tokens, i);
+        char* token = tokens_get_token(tokens, i);
+        prog_argv[i] = token;
       }
       prog_argv[argv_length - 1] = NULL;
       int flag;
       for (token = strtok_r(path_variable, ":", &rest); token != NULL; token = strtok_r(NULL, ":", &rest)) {
-        char *temp_str = malloc(sizeof(token));
+        char temp_str[64];
         strcpy(temp_str, token);
         strcat(temp_str, "/");
         strcat(temp_str, prog_argv[0]);
         if (stat(temp_str, &stat_buffer) == 0) {
-          prog_argv[0] = temp_str;
-          printf("%s\n", prog_argv[0]);
+          strcpy(prog_argv[0], temp_str);
           break;
         }
       }
