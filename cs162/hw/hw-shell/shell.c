@@ -10,6 +10,7 @@
 #include <sys/wait.h>
 #include <termios.h>
 #include <unistd.h>
+#include <sys/stat.h>
 
 #include "tokenizer.h"
 
@@ -131,14 +132,29 @@ int main(unused int argc, unused char* argv[]) {
     if (fundex >= 0) {
       cmd_table[fundex].fun(tokens);
     } else {
+      char *path_variable = getenv("PATH");
+      char *token;
+      char *rest = NULL;
+      struct stat stat_buffer;
       size_t argv_length = tokens_get_length(tokens) + 1;
       char** prog_argv = malloc(argv_length);
       for(int i = 0; i < argv_length - 1; i++) {
         prog_argv[i] = tokens_get_token(tokens, i);
       }
       prog_argv[argv_length - 1] = NULL;
-      pid_t pid = fork();
       int flag;
+      for (token = strtok_r(path_variable, ":", &rest); token != NULL; token = strtok_r(NULL, ":", &rest)) {
+        char *temp_str = malloc(sizeof(token));
+        strcpy(temp_str, token);
+        strcat(temp_str, "/");
+        strcat(temp_str, prog_argv[0]);
+        if (stat(temp_str, &stat_buffer) == 0) {
+          prog_argv[0] = temp_str;
+          printf("%s\n", prog_argv[0]);
+          break;
+        }
+      }
+      pid_t pid = fork();
       if (pid != 0) {
         wait(&flag);
       }
