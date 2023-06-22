@@ -16,7 +16,12 @@
 
 /* Convenience macro to silence compiler warnings about unused function parameters. */
 #define unused __attribute__((unused))
-
+#define NORMAL 1;
+#define LEFT_REDIRECT 2;
+#define RIGHT_REDIRECT 3;
+#define PIPE 4;
+#define READ_END 0;
+#define WRITE_END 1;
 /* Whether the shell is connected to an actual terminal or not. */
 bool shell_is_interactive;
 
@@ -112,6 +117,24 @@ void init_shell() {
   }
 }
 
+void decide_mode(int* mode, struct tokens* tokens) {
+  size_t tokens_length = tokens_get_length(tokens);
+  for (int i = 0; i < tokens_length; i++) {
+    if (strcmp(tokens_get_token(tokens, i), "<") == 0) {
+      mode = LEFT_REDIRECT;
+      return;
+    } else if(strcmp(tokens_get_token(tokens, i), ">") == 0) {
+      mode = RIGHT_REDIRECT;
+      return;
+    } else if(strcmp(tokens_get_token(tokens, i), "|") == 0) {
+      mode = PIPE;
+      return;
+    }
+  }
+  mode = NORMAL;
+  return;
+}
+
 int main(unused int argc, unused char* argv[]) {
   init_shell();
 
@@ -132,78 +155,89 @@ int main(unused int argc, unused char* argv[]) {
     if (fundex >= 0) {
       cmd_table[fundex].fun(tokens);
     } else {
-      char *path_variable = getenv("PATH");
-      char *token;
-      char *rest = NULL;
-      struct stat stat_buffer;
-      size_t argv_length = tokens_get_length(tokens) + 1;
-      char* prog_argv[argv_length];
-      int save_stdin = dup(0);
-      int save_stdout = dup(1);
-      int fd;
-      int pipe_count = 0;
-      for(int i = 0; i < argv_length - 1; i++) {
-        char* token = tokens_get_token(tokens, i);
-        if (strcmp(token, "|") == 0) {
-          pipe_count += 1;
-        }
-        if (strcmp(token, "<") == 0) {
-          // change stdin to specified file
-          if ((fd = open(tokens_get_token(tokens, i + 1), O_RDONLY)) < 0) {
-            exit(0);
-          }
-          argv_length -= 2;
-          dup2(fd, 0);
-          break;
-        } else if (strcmp(token, ">") == 0) {
-          // change stdout to specified file
-          if ((fd = open(tokens_get_token(tokens, i + 1), O_CREAT|O_TRUNC|O_RDWR, 0644)) < 0) {
-            exit(0);
-          }
-          argv_length -= 2;
-          fflush(stdout);
-          dup2(fd, 1);
-          break;
-        } else {
-          prog_argv[i] = token;
-        }
+      int mode = 0;
+      decide_mode(&mode, tokens);
+      if (mode == NORMAL) {
+
+      } else if (mode == LEFT_REDIRECT) {
+
+      } else if (mode == RIGHT_REDIRECT) {
+
+      } else if (mode == PIPE) {
+        
       }
-      int pipe_array[pipe_count][2];
-      prog_argv[argv_length - 1] = NULL;
-      int flag;
-      for (token = strtok_r(path_variable, ":", &rest); token != NULL; token = strtok_r(NULL, ":", &rest)) {
-        char temp_str[64];
-        strcpy(temp_str, token);
-        strcat(temp_str, "/");
-        strcat(temp_str, prog_argv[0]);
-        if (stat(temp_str, &stat_buffer) == 0) {
-          strcpy(prog_argv[0], temp_str);
-          break;
-        }
-      }
-      if (pipe_count > 0) {
-        for (int i = 0; i < pipe_count + 1; i++) {
-          pid_t pid = fork();
-          if (pid == 0) {
+      // char *path_variable = getenv("PATH");
+      // char *token;
+      // char *rest = NULL;
+      // struct stat stat_buffer;
+      // size_t argv_length = tokens_get_length(tokens) + 1;
+      // char* prog_argv[argv_length];
+      // int save_stdin = dup(0);
+      // int save_stdout = dup(1);
+      // int fd;
+      // int pipe_count = 0;
+      // for(int i = 0; i < argv_length - 1; i++) {
+      //   char* token = tokens_get_token(tokens, i);
+      //   if (strcmp(token, "|") == 0) {
+      //     pipe_count += 1;
+      //   }
+      //   if (strcmp(token, "<") == 0) {
+      //     // change stdin to specified file
+      //     if ((fd = open(tokens_get_token(tokens, i + 1), O_RDONLY)) < 0) {
+      //       exit(0);
+      //     }
+      //     argv_length -= 2;
+      //     dup2(fd, 0);
+      //     break;
+      //   } else if (strcmp(token, ">") == 0) {
+      //     // change stdout to specified file
+      //     if ((fd = open(tokens_get_token(tokens, i + 1), O_CREAT|O_TRUNC|O_RDWR, 0644)) < 0) {
+      //       exit(0);
+      //     }
+      //     argv_length -= 2;
+      //     fflush(stdout);
+      //     dup2(fd, 1);
+      //     break;
+      //   } else {
+      //     prog_argv[i] = token;
+      //   }
+      // }
+      // int pipe_array[pipe_count][2];
+      // prog_argv[argv_length - 1] = NULL;
+      // int flag;
+      // for (token = strtok_r(path_variable, ":", &rest); token != NULL; token = strtok_r(NULL, ":", &rest)) {
+      //   char temp_str[64];
+      //   strcpy(temp_str, token);
+      //   strcat(temp_str, "/");
+      //   strcat(temp_str, prog_argv[0]);
+      //   if (stat(temp_str, &stat_buffer) == 0) {
+      //     strcpy(prog_argv[0], temp_str);
+      //     break;
+      //   }
+      // }
+      // if (pipe_count > 0) {
+      //   for (int i = 0; i < pipe_count + 1; i++) {
+      //     pid_t pid = fork();
+      //     if (pid == 0) {
             
-            exit(0);
-          }
-        }
-      } else {
-        pid_t pid = fork();
-        if (pid != 0) {
-          wait(&flag);
-        }
-        if (pid == 0) {
-          execv(prog_argv[0], prog_argv);
-          exit(0);
-        }
-      }
-      close(fd);
-      dup2(save_stdin, 0);
-      dup2(save_stdout, 1);
-      close(save_stdin);
-      close(save_stdout);
+      //       exit(0);
+      //     }
+      //   }
+      // } else {
+      //   pid_t pid = fork();
+      //   if (pid != 0) {
+      //     wait(&flag);
+      //   }
+      //   if (pid == 0) {
+      //     execv(prog_argv[0], prog_argv);
+      //     exit(0);
+      //   }
+      // }
+      // close(fd);
+      // dup2(save_stdin, 0);
+      // dup2(save_stdout, 1);
+      // close(save_stdin);
+      // close(save_stdout);
     }
 
     if (shell_is_interactive)
