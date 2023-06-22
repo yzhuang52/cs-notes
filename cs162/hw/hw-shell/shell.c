@@ -141,8 +141,12 @@ int main(unused int argc, unused char* argv[]) {
       int save_stdin = dup(0);
       int save_stdout = dup(1);
       int fd;
+      int pipe_count = 0;
       for(int i = 0; i < argv_length - 1; i++) {
         char* token = tokens_get_token(tokens, i);
+        if (strcmp(token, "|") == 0) {
+          pipe_count += 1;
+        }
         if (strcmp(token, "<") == 0) {
           // change stdin to specified file
           if ((fd = open(tokens_get_token(tokens, i + 1), O_RDONLY)) < 0) {
@@ -164,6 +168,7 @@ int main(unused int argc, unused char* argv[]) {
           prog_argv[i] = token;
         }
       }
+      int pipe_array[pipe_count][2];
       prog_argv[argv_length - 1] = NULL;
       int flag;
       for (token = strtok_r(path_variable, ":", &rest); token != NULL; token = strtok_r(NULL, ":", &rest)) {
@@ -176,13 +181,23 @@ int main(unused int argc, unused char* argv[]) {
           break;
         }
       }
-      pid_t pid = fork();
-      if (pid != 0) {
-        wait(&flag);
-      }
-      if (pid == 0) {
-        execv(prog_argv[0], prog_argv);
-        exit(0);
+      if (pipe_count > 0) {
+        for (int i = 0; i < pipe_count + 1; i++) {
+          pid_t pid = fork();
+          if (pid == 0) {
+            
+            exit(0);
+          }
+        }
+      } else {
+        pid_t pid = fork();
+        if (pid != 0) {
+          wait(&flag);
+        }
+        if (pid == 0) {
+          execv(prog_argv[0], prog_argv);
+          exit(0);
+        }
       }
       close(fd);
       dup2(save_stdin, 0);
