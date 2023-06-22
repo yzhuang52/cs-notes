@@ -16,12 +16,12 @@
 
 /* Convenience macro to silence compiler warnings about unused function parameters. */
 #define unused __attribute__((unused))
-#define NORMAL 1;
-#define LEFT_REDIRECT 2;
-#define RIGHT_REDIRECT 3;
-#define PIPE 4;
-#define READ_END 0;
-#define WRITE_END 1;
+#define NORMAL 1
+#define LEFT_REDIRECT 2
+#define RIGHT_REDIRECT 3
+#define PIPE 4
+#define R_END 0
+#define W_END 1
 /* Whether the shell is connected to an actual terminal or not. */
 bool shell_is_interactive;
 
@@ -121,20 +121,214 @@ void decide_mode(int* mode, struct tokens* tokens) {
   size_t tokens_length = tokens_get_length(tokens);
   for (int i = 0; i < tokens_length; i++) {
     if (strcmp(tokens_get_token(tokens, i), "<") == 0) {
-      mode = LEFT_REDIRECT;
+      *mode = LEFT_REDIRECT;
       return;
     } else if(strcmp(tokens_get_token(tokens, i), ">") == 0) {
-      mode = RIGHT_REDIRECT;
+      *mode = RIGHT_REDIRECT;
       return;
     } else if(strcmp(tokens_get_token(tokens, i), "|") == 0) {
-      mode = PIPE;
+      *mode = PIPE;
       return;
     }
   }
-  mode = NORMAL;
+  *mode = NORMAL;
   return;
 }
 
+int execute_path_resolution(char* command, char** command_array) {
+  if (execv(command, command_array) == -1) {
+    // Fail to execute program, try path resolution
+    char *path_variable = getenv("PATH");
+    char* token;
+    char* rest = NULL;
+    struct stat stat_buffer;
+    for (token = strtok_r(path_variable, ":", &rest); token != NULL; token = strtok_r(NULL, ":", &rest)) {
+        char temp_str[64];
+        strcpy(temp_str, token);
+        strcat(temp_str, "/");
+        strcat(temp_str, command);
+        if (stat(temp_str, &stat_buffer) == 0) {
+          strcpy(command, temp_str);
+          break;
+        }
+    }
+    if (execv(command, command_array) == -1) {
+      return -1;
+    }
+  }
+  return 0;
+}
+
+void execute_normal(struct tokens* tokens) {
+  pid_t pid;
+  pid = fork();
+  if (pid) {
+    // Parent process
+    if (wait(NULL) == -1) {
+      printf("wait fail\n");
+    }
+  } else {
+    // Children process
+    size_t tokens_length = tokens_get_length(tokens);
+    char* prog_argv[tokens_length + 1];
+    for (int i = 0; i < tokens_length; i++) {
+      char* token = tokens_get_token(tokens, i);
+      prog_argv[i] = token;
+    }
+    prog_argv[tokens_length] = NULL;
+    if (execute_path_resolution(prog_argv[0], prog_argv) == -1) {
+      printf("execute fail\n");
+    }
+    exit(0);
+  }
+
+}
+
+void execute_redirect(struct tokens* tokens, int direction) {
+  char* redirect_file;
+  size_t tokens_length = tokens_get_length(tokens);
+  int fd;
+  
+  // Valid token should remove direction flag and redirect file
+  pid_t pid = fork();
+  if (pid) {
+    // Parent process
+    if (wait(NULL) == -1) {
+      printf("wait fail\n");
+    }
+  } else {
+    // Children process
+    int save_stdin = dup(0);
+    int save_stdout = dup(1);
+    char* prog_argv[tokens_length + 1 - 2];
+    for (int i = 0; i < tokens_length; i++) {
+      char* token = tokens_get_token(tokens, i);
+      if (strcmp(token, "<") == 0 || strcmp(token, ">") == 0) {
+        redirect_file = tokens_get_token(tokens, i + 1);
+        break;
+      }
+      prog_argv[i] = token;
+    }
+    prog_argv[tokens_length - 2] = NULL;
+    if (direction == LEFT_REDIRECT) {
+      if ((fd = open(redirect_file, O_RDONLY)) < 0) {
+        printf("can't open input file\n");
+        exit(0);
+      } 
+      dup2(fd, 0);
+      close(fd);
+    } else if (direction == RIGHT_REDIRECT) {
+      if ((fd = open(redirect_file, O_CREAT|O_TRUNC|O_RDWR, 0644)) < 0) {
+        printf("can't open output file\n");
+        exit(0);
+      }
+      dup2(fd, 1);
+      close(fd);
+    }
+    if (execute_path_resolution(prog_argv[0], prog_argv) == -1) {
+      printf("execute fail\n");
+    }
+    dup2(save_stdin, 0);
+    dup2(save_stdout, 1);
+    close(save_stdin);
+    close(save_stdout);
+    exit(0);
+  }
+}
+
+void execute_pipe(struct tokens* tokens) {
+  size_t tokens_length = tokens_get_length(tokens);
+  // number of pipes
+  int pipe_num = 0;
+  /*
+  number of args for each command
+  we only need an array has capacity larger than pipe_num
+  since we can only know pipe_num after parsing, I choose tokens_length which is larger than pipe_num
+  */ 
+  int argv_num[tokens_length];
+  /*
+  Parse tokens to count pipes and prepare container for arguments of each process
+  For cat shell.c | grep "tokens" | wc 
+  argc_group will end up like the following
+  {{"cat", "shell.c", NULL}, {"grep", "tokens", NULL}, {"wc", NULL}}
+  */
+  argv_num[pipe_num] = 0;
+  for (int i = 0; i < tokens_length; i++) {
+    if (strcmp(tokens_get_token(tokens, i), "|") == 0) {
+      pipe_num += 1;
+      argv_num[pipe_num] = 0;
+    } else {
+      argv_num[pipe_num] += 1;
+    }
+  }
+  int process_num = pipe_num + 1;
+  char*** argv_group = malloc(sizeof(char**) * process_num);
+  for (int i = 0; i < process_num; i++) {
+    argv_group[i] = malloc(sizeof(char*) * argv_num[i]);
+  }
+
+  // Initialize argv_group
+  int process_index = 0;
+  int arg_index = 0;
+  for (int i = 0; i < tokens_length; i++) {
+    char* token = tokens_get_token(tokens, i);
+    if (strcmp(token, "|") == 0) {
+      argv_group[process_index][arg_index] = NULL;
+      arg_index = 0;
+      process_index += 1;
+    } else {
+      argv_group[process_index][arg_index] = token;
+      arg_index += 1;
+    }
+  }
+
+  int p[pipe_num][2];
+  for (int i = 0; i < pipe_num; i++) {
+    pipe(p[i]);
+  }
+  if (fork() == 0) {
+      /* Redirect output of process into pipe */
+      close(p[0][R_END]);
+      dup2( p[0][W_END], 1 );
+      close(p[0][W_END]);
+      if (execute_path_resolution(argv_group[0][0], argv_group[0]) == -1) {
+        printf("fail to execute\n");
+        exit(-1);
+      }
+  }
+
+  for (int i = 1; i < pipe_num; i++) {
+    if (fork() == 0) {
+      close(p[i - 1][W_END]);
+      close(p[i][R_END]);
+      dup2(p[i - 1][R_END], 0);
+      close(p[i - 1][R_END]);
+      dup2(p[i][W_END], 1);
+      close(p[i][W_END]);
+      if (execute_path_resolution(argv_group[i][0], argv_group[i]) == -1) {
+        printf("fail to execute\n");
+        exit(-1);
+      }
+      exit(0);
+    }
+  }
+
+  if ( fork() == 0 ) {
+      /* Redirect input of process out of pipe */
+      close(p[pipe_num - 1][W_END]);
+      dup2( p[pipe_num - 1][R_END], 0 );
+      close(p[pipe_num - 1][R_END]);
+      if (execute_path_resolution(argv_group[process_num - 1][0], argv_group[process_num - 1]) == -1) {
+        printf("fail to execute\n");
+        exit(-1);
+      }
+  }
+  /* Main process */
+  close( p[0][W_END] );
+  close( p[pipe_num - 1][R_END] );
+  wait(NULL);
+  
+}
 int main(unused int argc, unused char* argv[]) {
   init_shell();
 
@@ -158,86 +352,14 @@ int main(unused int argc, unused char* argv[]) {
       int mode = 0;
       decide_mode(&mode, tokens);
       if (mode == NORMAL) {
-
+        execute_normal(tokens);
       } else if (mode == LEFT_REDIRECT) {
-
+        execute_redirect(tokens, mode);
       } else if (mode == RIGHT_REDIRECT) {
-
+        execute_redirect(tokens, mode);
       } else if (mode == PIPE) {
-        
+        execute_pipe(tokens);
       }
-      // char *path_variable = getenv("PATH");
-      // char *token;
-      // char *rest = NULL;
-      // struct stat stat_buffer;
-      // size_t argv_length = tokens_get_length(tokens) + 1;
-      // char* prog_argv[argv_length];
-      // int save_stdin = dup(0);
-      // int save_stdout = dup(1);
-      // int fd;
-      // int pipe_count = 0;
-      // for(int i = 0; i < argv_length - 1; i++) {
-      //   char* token = tokens_get_token(tokens, i);
-      //   if (strcmp(token, "|") == 0) {
-      //     pipe_count += 1;
-      //   }
-      //   if (strcmp(token, "<") == 0) {
-      //     // change stdin to specified file
-      //     if ((fd = open(tokens_get_token(tokens, i + 1), O_RDONLY)) < 0) {
-      //       exit(0);
-      //     }
-      //     argv_length -= 2;
-      //     dup2(fd, 0);
-      //     break;
-      //   } else if (strcmp(token, ">") == 0) {
-      //     // change stdout to specified file
-      //     if ((fd = open(tokens_get_token(tokens, i + 1), O_CREAT|O_TRUNC|O_RDWR, 0644)) < 0) {
-      //       exit(0);
-      //     }
-      //     argv_length -= 2;
-      //     fflush(stdout);
-      //     dup2(fd, 1);
-      //     break;
-      //   } else {
-      //     prog_argv[i] = token;
-      //   }
-      // }
-      // int pipe_array[pipe_count][2];
-      // prog_argv[argv_length - 1] = NULL;
-      // int flag;
-      // for (token = strtok_r(path_variable, ":", &rest); token != NULL; token = strtok_r(NULL, ":", &rest)) {
-      //   char temp_str[64];
-      //   strcpy(temp_str, token);
-      //   strcat(temp_str, "/");
-      //   strcat(temp_str, prog_argv[0]);
-      //   if (stat(temp_str, &stat_buffer) == 0) {
-      //     strcpy(prog_argv[0], temp_str);
-      //     break;
-      //   }
-      // }
-      // if (pipe_count > 0) {
-      //   for (int i = 0; i < pipe_count + 1; i++) {
-      //     pid_t pid = fork();
-      //     if (pid == 0) {
-            
-      //       exit(0);
-      //     }
-      //   }
-      // } else {
-      //   pid_t pid = fork();
-      //   if (pid != 0) {
-      //     wait(&flag);
-      //   }
-      //   if (pid == 0) {
-      //     execv(prog_argv[0], prog_argv);
-      //     exit(0);
-      //   }
-      // }
-      // close(fd);
-      // dup2(save_stdin, 0);
-      // dup2(save_stdout, 1);
-      // close(save_stdin);
-      // close(save_stdout);
     }
 
     if (shell_is_interactive)
