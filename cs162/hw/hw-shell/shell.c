@@ -164,9 +164,26 @@ void execute_normal(struct tokens* tokens) {
   pid = fork();
   if (pid) {
     // Parent process
+    struct sigaction dfl;
+    struct sigaction ign;
+    dfl.sa_handler = SIG_DFL;
+    ign.sa_handler = SIG_IGN;
+    // Ignore signal handler for background process
+    sigaction(SIGTTOU, &ign, NULL);
+    // Set child process group id to its own pid
+    if (setpgid(pid, pid) == -1) {
+      printf("set process group id fail\n");
+      exit(-1);
+    }
+    // Set child process group to foreground terminal
+    tcsetpgrp(0, pid);
     if (wait(NULL) == -1) {
       printf("wait fail\n");
     }
+    tcsetpgrp(0, getpgid(getpid()));
+    printf("\n");
+    // Restore default handler for background process
+    sigaction(SIGTTOU, &dfl, NULL);
   } else {
     // Children process
     size_t tokens_length = tokens_get_length(tokens);
@@ -181,7 +198,7 @@ void execute_normal(struct tokens* tokens) {
     }
     exit(0);
   }
-
+  // Set parent process group back to foreground terminal
 }
 
 void execute_redirect(struct tokens* tokens, int direction) {
@@ -193,9 +210,26 @@ void execute_redirect(struct tokens* tokens, int direction) {
   pid_t pid = fork();
   if (pid) {
     // Parent process
+    struct sigaction dfl;
+    struct sigaction ign;
+    dfl.sa_handler = SIG_DFL;
+    ign.sa_handler = SIG_IGN;
+    // Ignore signal handler for background process
+    sigaction(SIGTTOU, &ign, NULL);
+    // Set child process group id to its own pid
+    if (setpgid(pid, pid) == -1) {
+      printf("set process group id fail\n");
+      exit(-1);
+    }
+    // Set child process group to foreground terminal
+    tcsetpgrp(0, pid);
     if (wait(NULL) == -1) {
       printf("wait fail\n");
     }
+    tcsetpgrp(0, getpgid(getpid()));
+    printf("\n");
+    // Restore default handler for background process
+    sigaction(SIGTTOU, &dfl, NULL);
   } else {
     // Children process
     int save_stdin = dup(0);
@@ -236,26 +270,33 @@ void execute_redirect(struct tokens* tokens, int direction) {
   }
 }
 
+pid_t child_pgid;
 int spawn_proc (int in, int out, char** argv)
 {
   pid_t pid;
+  if ((pid = fork ()) == 0) {
+    if (in != 0)
+      {
+        dup2 (in, 0);
+        close (in);
+      }
 
-  if ((pid = fork ()) == 0)
-    {
-      if (in != 0)
-        {
-          dup2 (in, 0);
-          close (in);
-        }
+    if (out != 1)
+      {
+        dup2 (out, 1);
+        close (out);
+      }
 
-      if (out != 1)
-        {
-          dup2 (out, 1);
-          close (out);
-        }
-
-      return execute_path_resolution(argv[0], argv);
+    return execute_path_resolution(argv[0], argv);
+  } else {
+    if (!child_pgid) {
+      child_pgid = pid;
     }
+    if (setpgid(pid, child_pgid) == -1) {
+      printf("set process group id fail\n");
+      exit(-1);
+    }
+  }
 
   return pid;
 }
@@ -305,7 +346,13 @@ void execute_pipe(struct tokens* tokens) {
       arg_index += 1;
     }
   }
-
+  struct sigaction dfl;
+  struct sigaction ign;
+  dfl.sa_handler = SIG_DFL;
+  ign.sa_handler = SIG_IGN;
+  // Ignore signal handler for background process
+  sigaction(SIGTTOU, &ign, NULL);
+  
   int p[2];
   int in = 0;
 
@@ -318,15 +365,23 @@ void execute_pipe(struct tokens* tokens) {
     close(p[1]);
     in = p[0];
   }
-
-  if (in != 0)
-    dup2 (in, 0);
-  /* Main process */
+  // Put child process group to foreground
+  tcsetpgrp(0, child_pgid);
   
-  if (execute_path_resolution(argv_group[pipe_num][0], argv_group[pipe_num]) == -1) {
-    printf("fail to execute\n");
-    exit(-1);
+  if (fork() == 0) {
+    if (in != 0)
+      dup2 (in, 0);
+    if (execute_path_resolution(argv_group[pipe_num][0], argv_group[pipe_num]) == -1) {
+      printf("fail to execute\n");
+      exit(-1);
+    }
+    exit(0);
   }
+  while (wait(NULL) > 0);
+  // Put parent process group to foreground
+  tcsetpgrp(0, getpgid(getpid()));
+  // Restore default handler for background process
+  sigaction(SIGTTOU, &dfl, NULL);
   
 }
 int main(unused int argc, unused char* argv[]) {
