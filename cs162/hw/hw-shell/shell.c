@@ -236,6 +236,30 @@ void execute_redirect(struct tokens* tokens, int direction) {
   }
 }
 
+int spawn_proc (int in, int out, char** argv)
+{
+  pid_t pid;
+
+  if ((pid = fork ()) == 0)
+    {
+      if (in != 0)
+        {
+          dup2 (in, 0);
+          close (in);
+        }
+
+      if (out != 1)
+        {
+          dup2 (out, 1);
+          close (out);
+        }
+
+      return execute_path_resolution(argv[0], argv);
+    }
+
+  return pid;
+}
+
 void execute_pipe(struct tokens* tokens) {
   size_t tokens_length = tokens_get_length(tokens);
   // number of pipes
@@ -282,51 +306,27 @@ void execute_pipe(struct tokens* tokens) {
     }
   }
 
-  int p[pipe_num][2];
+  int p[2];
+  int in = 0;
+
   for (int i = 0; i < pipe_num; i++) {
-    pipe(p[i]);
-  }
-  if (fork() == 0) {
-      /* Redirect output of process into pipe */
-      close(p[0][R_END]);
-      dup2( p[0][W_END], 1 );
-      close(p[0][W_END]);
-      if (execute_path_resolution(argv_group[0][0], argv_group[0]) == -1) {
-        printf("fail to execute\n");
-        exit(-1);
-      }
-  }
-
-  for (int i = 1; i < pipe_num; i++) {
-    if (fork() == 0) {
-      close(p[i - 1][W_END]);
-      close(p[i][R_END]);
-      dup2(p[i - 1][R_END], 0);
-      close(p[i - 1][R_END]);
-      dup2(p[i][W_END], 1);
-      close(p[i][W_END]);
-      if (execute_path_resolution(argv_group[i][0], argv_group[i]) == -1) {
-        printf("fail to execute\n");
-        exit(-1);
-      }
-      exit(0);
+    pipe(p);
+    if (spawn_proc(in, p[1], argv_group[i]) == -1) {
+      printf("fail to execute\n");
+      exit(-1);
     }
+    close(p[1]);
+    in = p[0];
   }
 
-  if ( fork() == 0 ) {
-      /* Redirect input of process out of pipe */
-      close(p[pipe_num - 1][W_END]);
-      dup2( p[pipe_num - 1][R_END], 0 );
-      close(p[pipe_num - 1][R_END]);
-      if (execute_path_resolution(argv_group[process_num - 1][0], argv_group[process_num - 1]) == -1) {
-        printf("fail to execute\n");
-        exit(-1);
-      }
-  }
+  if (in != 0)
+    dup2 (in, 0);
   /* Main process */
-  close( p[0][W_END] );
-  close( p[pipe_num - 1][R_END] );
-  wait(NULL);
+  
+  if (execute_path_resolution(argv_group[pipe_num][0], argv_group[pipe_num]) == -1) {
+    printf("fail to execute\n");
+    exit(-1);
+  }
   
 }
 int main(unused int argc, unused char* argv[]) {
