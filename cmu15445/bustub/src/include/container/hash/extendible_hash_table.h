@@ -105,7 +105,15 @@ class ExtendibleHashTable : public HashTable<K, V> {
    */
   auto Remove(const K &key) -> bool override;
 
-  auto TestKLSB(K key1, K key2, int k) -> bool;
+  /*
+  Test if the k-th bit of n is 1
+  */
+  auto TestKLSB(int n, int k) -> int;
+
+  /*
+  Get the k LSB of n
+  */
+  auto GetKLSB(int n, int k) -> int;
   /**
    * Bucket class for each hash table bucket that the directory points to.
    */
