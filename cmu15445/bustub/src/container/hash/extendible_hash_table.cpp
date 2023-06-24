@@ -84,10 +84,46 @@ void ExtendibleHashTable<K, V>::Insert(const K &key, const V &value) {
   if(dir_[index]->Insert(key, value)) {
     return;
   }
-  // If fail, 
+  // Bucket is full, needs to be splitted
+  int local_depth = GetLocalDepth(index);
+  int global_depth = GetGlobalDepth();
+  assert(global_depth >= local_depth);
+  if (global_depth > local_depth) {
+    // if global depth > local depth, no need to double directory size
+    global_depth += 1;
+    global_depth_ = global_depth;
+    auto original_size = dir_.size();
+    dir_.resize(dir_.size() * 2);
+    dir_[index]->IncrementDepth();
+    for (int i = 0; i < static_cast<int>(original_size); i++) {
+      dir_[original_size + i] = dir_[i];
+    }
+    RedistributeBucket(dir_[index]);
+  } else {
+    global_depth += 1;
+    global_depth_ = global_depth;
+    dir_[index]->IncrementDepth();
+    RedistributeBucket(dir_[index]);
+  }
   
 }
-
+template <typename K, typename V>
+void ExtendibleHashTable<K, V>::RedistributeBucket(std::shared_ptr<Bucket> bucket) {
+  // RedistributeBucket should split the bucket and reallocate key-value pair between 2 created buckets
+  std::list<std::pair<K, V>> list = bucket->GetItems();
+  int depth = bucket->GetDepth();
+  std::shared_ptr<Bucket> new_bucket = Bucket(bucket_size_, depth);
+  for (auto &b: dir_) {
+    if (TestKLSB(b->GetItems().begin()->first, list.begin()->first, depth)) {
+      b = 
+    }
+  }
+}
+template <typename K, typename V>
+auto ExtendibleHashTable<K, V>::TestKLSB(K key1, K key2, int k) -> bool {
+  int mask = (1 << k) - 1;
+  return (std::hash<K>()(key1) & mask) == (std::hash<K>()(key2) & mask)
+}
 //===--------------------------------------------------------------------===//
 // Bucket
 //===--------------------------------------------------------------------===//
