@@ -10,6 +10,7 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <sys/types.h>
 #include <cassert>
 #include <cstdlib>
 #include <functional>
@@ -17,6 +18,7 @@
 #include <utility>
 
 #include "container/hash/extendible_hash_table.h"
+#include "container/hash/hash_function.h"
 #include "storage/page/page.h"
 
 namespace bustub {
@@ -76,7 +78,14 @@ auto ExtendibleHashTable<K, V>::Remove(const K &key) -> bool {
 
 template <typename K, typename V>
 void ExtendibleHashTable<K, V>::Insert(const K &key, const V &value) {
-  UNREACHABLE("not implemented");
+  // Check if key value pair exists
+  // Try insert into bucket, return if succeed
+  size_t index = IndexOf(key);
+  if(dir_[index]->Insert(key, value)) {
+    return;
+  }
+  // If fail, 
+  
 }
 
 //===--------------------------------------------------------------------===//
