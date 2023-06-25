@@ -77,6 +77,7 @@ auto ExtendibleHashTable<K, V>::Find(const K &key, V &value) -> bool {
 
 template <typename K, typename V>
 auto ExtendibleHashTable<K, V>::Remove(const K &key) -> bool {
+  std::scoped_lock<std::mutex> lock(latch_);
   size_t index = IndexOf(key);
   return dir_[index]->Remove(key);
 }
@@ -87,12 +88,13 @@ void ExtendibleHashTable<K, V>::Insert(const K &key, const V &value) {
   // Try insert into bucket, return if succeed
   while (true) {
     size_t index = IndexOf(key);
+    int local_depth = GetLocalDepth(index);
+    int global_depth = GetGlobalDepth();
+    std::scoped_lock<std::mutex> lock(latch_);
     if(dir_[index]->Insert(key, value)) {
       return;
     }
     // Bucket is full, needs to be splitted
-    int local_depth = GetLocalDepth(index);
-    int global_depth = GetGlobalDepth();
     assert(global_depth >= local_depth);
     if (global_depth == local_depth) {
       global_depth += 1;
