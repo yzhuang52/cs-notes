@@ -12,12 +12,16 @@
 
 #pragma once
 
+#include <cstddef>
+#include <ctime>
 #include <limits>
 #include <list>
 #include <mutex>  // NOLINT
 #include <unordered_map>
+#include <utility>
 #include <vector>
-
+#include <memory>
+#include <algorithm>
 #include "common/config.h"
 #include "common/macros.h"
 
@@ -123,6 +127,7 @@ class LRUKReplacer {
    */
   void Remove(frame_id_t frame_id);
 
+
   /**
    * TODO(P1): Add implementation
    *
@@ -137,9 +142,12 @@ class LRUKReplacer {
   // Remove maybe_unused if you start using them.
   [[maybe_unused]] size_t current_timestamp_{0};
   [[maybe_unused]] size_t curr_size_{0};
-  [[maybe_unused]] size_t replacer_size_;
-  [[maybe_unused]] size_t k_;
+  size_t replacer_size_;
+  size_t k_;
   std::mutex latch_;
+  // history and cache will look like {frame_id: {ref, evictable}}
+  std::vector<std::shared_ptr<std::pair<frame_id_t, std::pair<size_t, bool>>>> history_;
+  std::vector<std::shared_ptr<std::pair<frame_id_t, std::pair<size_t, bool>>>> cache_;
 };
 
 }  // namespace bustub
