@@ -15,7 +15,7 @@
 
 namespace bustub {
 
-LRUKReplacer::LRUKReplacer(size_t num_frames, size_t k) : replacer_size_(0), k_(k) {
+LRUKReplacer::LRUKReplacer(size_t num_frames, size_t k) : num_frames_(num_frames), replacer_size_(0), k_(k) {
     // history_.resize(num_frames);
     // cache_.resize(num_frames);
 }
