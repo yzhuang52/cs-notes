@@ -28,6 +28,10 @@ static struct list ready_list;
    when they are first scheduled and removed when they exit. */
 static struct list all_list;
 
+/** List of processes in THREAD_BLOCKED state, that is processes
+     that are sleeping and waiting to wake up. */
+static struct list sleep_list;
+
 /** Idle thread. */
 static struct thread *idle_thread;
 
@@ -92,7 +96,7 @@ thread_init (void)
   lock_init (&tid_lock);
   list_init (&ready_list);
   list_init (&all_list);
-
+  list_init (&sleep_list);
   /* Set up a thread structure for the running thread. */
   initial_thread = running_thread ();
   init_thread (initial_thread, "main", PRI_DEFAULT);
@@ -240,6 +244,15 @@ thread_unblock (struct thread *t)
   list_push_back (&ready_list, &t->elem);
   t->status = THREAD_READY;
   intr_set_level (old_level);
+}
+
+/** Turn current thread state from THREAD_RUNNING into THREAD_BLOCKED
+    and insert thread into sleep_list by order of its sleep time
+*/
+void
+thread_sleep(int64_t sleep_time)
+{
+
 }
 
 /** Returns the name of the running thread. */
