@@ -246,8 +246,10 @@ thread_unblock (struct thread *t)
   intr_set_level (old_level);
 }
 
-bool less(const struct list_elem* a, const struct list_elem* b, void* aux) {
-  return false;
+bool less(const struct list_elem* a, const struct list_elem* b, void* aux UNUSED) {
+  struct thread *thread_a = list_entry(a, struct thread, sleep_elem);
+  struct thread *thread_b = list_entry(b, struct thread, sleep_elem);
+  return thread_a->local_ticks < thread_b->local_ticks;
 }
 /** Turn current thread state from THREAD_RUNNING into THREAD_BLOCKED
     and insert thread into sleep_list by order of its sleep time
@@ -274,6 +276,19 @@ thread_sleep(int64_t sleep_time)
   intr_set_level(old_level);
 }
 
+struct list_elem *
+thread_wakeup(int64_t current_time) {
+  struct list_elem* e;
+  for (e = list_begin(&sleep_list); e != list_end(&sleep_list); e != list_next(e)) {
+    struct thread *t = list_entry(e, struct thread, sleep_elem);
+    if (t->local_ticks <= current_time) {
+      return e;
+    }
+    list_remove(&t->sleep_elem);
+    thread_unblock(t);
+  }
+  return e;
+}
 /** Returns the name of the running thread. */
 const char *
 thread_name (void) 

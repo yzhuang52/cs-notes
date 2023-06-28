@@ -108,6 +108,7 @@ struct thread
    Controlled by kernel command-line option "-o mlfqs". */
 extern bool thread_mlfqs;
 
+bool less(const struct list_elem* a, const struct list_elem* b, void* aux);
 void thread_init (void);
 void thread_start (void);
 
@@ -121,6 +122,7 @@ void thread_block (void);
 void thread_unblock (struct thread *);
 
 void thread_sleep(int64_t sleep_time);
+struct list_elem * thread_wakeup(int64_t current_time);
 struct thread *thread_current (void);
 tid_t thread_tid (void);
 const char *thread_name (void);

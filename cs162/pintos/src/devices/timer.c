@@ -21,7 +21,7 @@
 static int64_t ticks;
 
 /** Minimum sleep ticks of all sleeping threads*/
-static int64_t global_ticks = ticks;
+static int64_t global_ticks;
 /** Number of loops per timer tick.
    Initialized by timer_calibrate(). */
 static unsigned loops_per_tick;
@@ -93,6 +93,9 @@ timer_sleep (int64_t ticks)
 {
   int64_t start = timer_ticks ();
   ASSERT (intr_get_level () == INTR_ON);
+  if (!global_ticks || global_ticks < start + ticks) {
+    global_ticks = start + ticks;
+  }
   if (timer_elapsed(start) < ticks) {
     thread_sleep(start + ticks);
   }
@@ -172,8 +175,25 @@ timer_print_stats (void)
 static void
 timer_interrupt (struct intr_frame *args UNUSED)
 {
+  /**
+    Check sleep list and the global tick
+    Find any threads to wake up
+    Move them into ready list
+    Update the global tick
+  */
+  enum intr_level old_level;
+  old_level = intr_disable();
   ticks++;
   thread_tick ();
+  if (ticks < global_ticks) {
+    return;
+  }
+  struct list_elem* sleep_thread_elem = thread_wakeup(ticks);
+  if (sleep_thread_elem) {
+    struct thread* sleep_thread = list_entry(sleep_thread_elem, struct thread, sleep_elem);
+    global_ticks = sleep_thread->local_ticks;
+  }
+  intr_set_level(old_level);
 }
 
 /** Returns true if LOOPS iterations waits for more than one timer
