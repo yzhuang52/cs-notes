@@ -246,13 +246,32 @@ thread_unblock (struct thread *t)
   intr_set_level (old_level);
 }
 
+bool less(const struct list_elem* a, const struct list_elem* b, void* aux) {
+  return false;
+}
 /** Turn current thread state from THREAD_RUNNING into THREAD_BLOCKED
     and insert thread into sleep_list by order of its sleep time
 */
 void
 thread_sleep(int64_t sleep_time)
 {
-
+  /**
+    If the current thread is not idle thread.
+    change the state of the caller thread into THREAD_BLOCKED,
+    store the local ticks to wake up,
+    update the global ticks if necessary,
+    and call schedule
+    Disable interrupt to avoid race condiction
+  */
+  enum intr_level old_level;
+  old_level = intr_disable();
+  struct thread* curr = thread_current();
+  curr->local_ticks = sleep_time;
+  
+  list_remove(&curr->elem);
+  list_insert_ordered(&sleep_list, &curr->sleep_elem, less, NULL);
+  thread_block();
+  intr_set_level(old_level);
 }
 
 /** Returns the name of the running thread. */
