@@ -102,6 +102,7 @@ thread_init (void)
   init_thread (initial_thread, "main", PRI_DEFAULT);
   initial_thread->status = THREAD_RUNNING;
   initial_thread->tid = allocate_tid ();
+
 }
 
 /** Starts preemptive thread scheduling by enabling interrupts.
@@ -270,7 +271,7 @@ thread_sleep(int64_t sleep_time)
   struct thread* curr = thread_current();
   curr->local_ticks = sleep_time;
   
-  list_remove(&curr->elem);
+  // list_remove(&curr->elem);
   list_insert_ordered(&sleep_list, &curr->sleep_elem, less, NULL);
   thread_block();
   intr_set_level(old_level);
@@ -279,15 +280,15 @@ thread_sleep(int64_t sleep_time)
 struct list_elem *
 thread_wakeup(int64_t current_time) {
   struct list_elem* e;
-  for (e = list_begin(&sleep_list); e != list_end(&sleep_list); e != list_next(e)) {
+  for (e = list_begin(&sleep_list); e != list_end(&sleep_list); e = list_next(e)) {
     struct thread *t = list_entry(e, struct thread, sleep_elem);
-    if (t->local_ticks <= current_time) {
+    if (t->local_ticks > current_time) {
       return e;
     }
     list_remove(&t->sleep_elem);
     thread_unblock(t);
   }
-  return e;
+  return NULL;
 }
 /** Returns the name of the running thread. */
 const char *

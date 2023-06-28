@@ -21,7 +21,7 @@
 static int64_t ticks;
 
 /** Minimum sleep ticks of all sleeping threads*/
-static int64_t global_ticks;
+static int64_t global_ticks = -1;
 /** Number of loops per timer tick.
    Initialized by timer_calibrate(). */
 static unsigned loops_per_tick;
@@ -72,6 +72,7 @@ timer_calibrate (void)
 int64_t
 timer_ticks (void) 
 {
+  
   enum intr_level old_level = intr_disable ();
   int64_t t = ticks;
   intr_set_level (old_level);
@@ -89,16 +90,17 @@ timer_elapsed (int64_t then)
 
    
 void
-timer_sleep (int64_t ticks) 
+timer_sleep (int64_t sleep_time) 
 {
+  enum intr_level old_level;
+  old_level = intr_disable();
   int64_t start = timer_ticks ();
-  ASSERT (intr_get_level () == INTR_ON);
-  if (!global_ticks || global_ticks < start + ticks) {
-    global_ticks = start + ticks;
+  if (global_ticks == -1 || global_ticks > start + sleep_time) {
+    global_ticks = start + sleep_time;
   }
-  if (timer_elapsed(start) < ticks) {
-    thread_sleep(start + ticks);
-  }
+  
+  thread_sleep(start + sleep_time);
+  intr_set_level(old_level);
 }
 
 /** Sleeps for approximately MS milliseconds.  Interrupts must be
@@ -185,13 +187,15 @@ timer_interrupt (struct intr_frame *args UNUSED)
   old_level = intr_disable();
   ticks++;
   thread_tick ();
-  if (ticks < global_ticks) {
+  if (global_ticks < 0 || ticks < global_ticks) {
     return;
   }
   struct list_elem* sleep_thread_elem = thread_wakeup(ticks);
+  struct thread* sleep_thread = list_entry(sleep_thread_elem, struct thread, sleep_elem);
   if (sleep_thread_elem) {
-    struct thread* sleep_thread = list_entry(sleep_thread_elem, struct thread, sleep_elem);
     global_ticks = sleep_thread->local_ticks;
+  } else {
+    global_ticks = -1;
   }
   intr_set_level(old_level);
 }
