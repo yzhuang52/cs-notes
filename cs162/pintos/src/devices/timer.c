@@ -95,6 +95,9 @@ timer_sleep (int64_t sleep_time)
   enum intr_level old_level;
   old_level = intr_disable();
   int64_t start = timer_ticks ();
+  if (sleep_time < 0) {
+    sleep_time = 0;
+  }
   if (global_ticks == -1 || global_ticks > start + sleep_time) {
     global_ticks = start + sleep_time;
   }
