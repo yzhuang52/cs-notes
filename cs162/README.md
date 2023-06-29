@@ -4,12 +4,12 @@
 
 The followings are discussions, HWs, Labects checklists
 
-## Discussions (4/11)
+## Discussions (5/11)
 1. ![#c5f015](https://placehold.co/15x15/c5f015/c5f015.png) Disc0 &nbsp; - ***COMPLETED***
 1. ![#c5f015](https://placehold.co/15x15/c5f015/c5f015.png) Disc1 &nbsp;  - ***COMPLETED***  
 1. ![#c5f015](https://placehold.co/15x15/c5f015/c5f015.png) Disc2 &nbsp;  - ***COMPLETED***
 1. ![#c5f015](https://placehold.co/15x15/c5f015/c5f015.png) Disc3 &nbsp;  - ***COMPLETED***
-1. ![#f03c15](https://placehold.co/15x15/f03c15/f03c15.png) Disc4 &nbsp;  - ***ONGOING***  
+1. ![#c5f015](https://placehold.co/15x15/c5f015/c5f015.png) Disc4 &nbsp;  - ***COMPLETED***  
 1. ![#f03c15](https://placehold.co/15x15/f03c15/f03c15.png) Disc5 &nbsp;  - ***ONGOING***
 1. ![#f03c15](https://placehold.co/15x15/f03c15/f03c15.png) Disc6 &nbsp;  - ***ONGOING***
 1. ![#f03c15](https://placehold.co/15x15/f03c15/f03c15.png) Disc7 &nbsp;  - ***ONGOING***
