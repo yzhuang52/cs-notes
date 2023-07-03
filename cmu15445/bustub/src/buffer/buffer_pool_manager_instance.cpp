@@ -12,6 +12,7 @@
 
 #include "buffer/buffer_pool_manager_instance.h"
 
+#include "common/config.h"
 #include "common/exception.h"
 #include "common/macros.h"
 
@@ -30,10 +31,6 @@ BufferPoolManagerInstance::BufferPoolManagerInstance(size_t pool_size, DiskManag
     free_list_.emplace_back(static_cast<int>(i));
   }
 
-  // TODO(students): remove this line after you have implemented the buffer pool manager
-  throw NotImplementedException(
-      "BufferPoolManager is not implemented yet. If you have finished implementing BPM, please remove the throw "
-      "exception line in `buffer_pool_manager_instance.cpp`.");
 }
 
 BufferPoolManagerInstance::~BufferPoolManagerInstance() {
@@ -44,13 +41,40 @@ BufferPoolManagerInstance::~BufferPoolManagerInstance() {
 
 auto BufferPoolManagerInstance::NewPgImp(page_id_t *page_id) -> Page * { return nullptr; }
 
-auto BufferPoolManagerInstance::FetchPgImp(page_id_t page_id) -> Page * { return nullptr; }
+auto BufferPoolManagerInstance::FetchPgImp(page_id_t page_id) -> Page * {
+  if (free_list_.empty()) {
+    return nullptr;
+  }
+  return nullptr;
+}
 
-auto BufferPoolManagerInstance::UnpinPgImp(page_id_t page_id, bool is_dirty) -> bool { return false; }
+auto BufferPoolManagerInstance::UnpinPgImp(page_id_t page_id, bool is_dirty) -> bool {
+  frame_id_t frame_id;
+  if (!page_table_->Find(page_id, frame_id) || pages_[frame_id].GetPinCount() == 0) {
+    return false;
+  }
+  pages_[frame_id].pin_count_ -= 1;
+  if (pages_[frame_id].GetPinCount() == 0) {
+    replacer_->SetEvictable(frame_id, true);
+  }
+  return true;
+}
 
-auto BufferPoolManagerInstance::FlushPgImp(page_id_t page_id) -> bool { return false; }
+auto BufferPoolManagerInstance::FlushPgImp(page_id_t page_id) -> bool {
+  frame_id_t frame_id;
+  if (!page_table_->Find(page_id, frame_id)) {
+    return false;
+  }
+  disk_manager_->WritePage(page_id, pages_[frame_id].GetData());
+  return true;
+}
 
-void BufferPoolManagerInstance::FlushAllPgsImp() {}
+void BufferPoolManagerInstance::FlushAllPgsImp() {
+  size_t page_num = pool_size_ - free_list_.size();
+  for (size_t i = 0; i < page_num; i++) {
+    disk_manager_->WritePage(pages_[i].GetPageId(), pages_[i].GetData());
+  }
+}
 
 auto BufferPoolManagerInstance::DeletePgImp(page_id_t page_id) -> bool { return false; }
 
