@@ -27,8 +27,8 @@ namespace bustub {
 template <typename K, typename V>
 ExtendibleHashTable<K, V>::ExtendibleHashTable(size_t bucket_size)
     : global_depth_(0), bucket_size_(bucket_size), num_buckets_(1) {
-      dir_.resize(num_buckets_, std::make_shared<Bucket>(bucket_size, 0));
-    }
+  dir_.resize(num_buckets_, std::make_shared<Bucket>(bucket_size, 0));
+}
 
 template <typename K, typename V>
 auto ExtendibleHashTable<K, V>::IndexOf(const K &key) -> size_t {
@@ -38,7 +38,7 @@ auto ExtendibleHashTable<K, V>::IndexOf(const K &key) -> size_t {
 
 template <typename K, typename V>
 auto ExtendibleHashTable<K, V>::GetGlobalDepth() const -> int {
-  std::scoped_lock<std::mutex> lock(latch_);
+  // std::scoped_lock<std::mutex> lock(latch_);
   return GetGlobalDepthInternal();
 }
 
@@ -49,7 +49,7 @@ auto ExtendibleHashTable<K, V>::GetGlobalDepthInternal() const -> int {
 
 template <typename K, typename V>
 auto ExtendibleHashTable<K, V>::GetLocalDepth(int dir_index) const -> int {
-  std::scoped_lock<std::mutex> lock(latch_);
+  // std::scoped_lock<std::mutex> lock(latch_);
   return GetLocalDepthInternal(dir_index);
 }
 
@@ -71,6 +71,7 @@ auto ExtendibleHashTable<K, V>::GetNumBucketsInternal() const -> int {
 
 template <typename K, typename V>
 auto ExtendibleHashTable<K, V>::Find(const K &key, V &value) -> bool {
+  std::scoped_lock<std::mutex> lock(latch_);
   size_t index = IndexOf(key);
   return dir_[index]->Find(key, value);
 }
@@ -86,12 +87,12 @@ template <typename K, typename V>
 void ExtendibleHashTable<K, V>::Insert(const K &key, const V &value) {
   // Check if key value pair exists
   // Try insert into bucket, return if succeed
+  std::scoped_lock<std::mutex> lock(latch_);
   while (true) {
     size_t index = IndexOf(key);
     int local_depth = GetLocalDepth(index);
     int global_depth = GetGlobalDepth();
-    std::scoped_lock<std::mutex> lock(latch_);
-    if(dir_[index]->Insert(key, value)) {
+    if (dir_[index]->Insert(key, value)) {
       return;
     }
     // Bucket is full, needs to be splitted
@@ -112,7 +113,6 @@ void ExtendibleHashTable<K, V>::Insert(const K &key, const V &value) {
       RedistributeBucket(dir_[index]);
     }
   }
-  
 }
 template <typename K, typename V>
 void ExtendibleHashTable<K, V>::RedistributeBucket(std::shared_ptr<Bucket> bucket) {
@@ -135,13 +135,11 @@ void ExtendibleHashTable<K, V>::RedistributeBucket(std::shared_ptr<Bucket> bucke
       it++;
     }
   }
-
-
 }
 template <typename K, typename V>
 auto ExtendibleHashTable<K, V>::TestKLSB(int n, int k) -> int {
   int mask = (1 << k);
-  return n & mask; 
+  return n & mask;
 }
 
 template <typename K, typename V>
@@ -168,10 +166,10 @@ auto ExtendibleHashTable<K, V>::Bucket::Find(const K &key, V &value) -> bool {
 
 template <typename K, typename V>
 auto ExtendibleHashTable<K, V>::Bucket::Remove(const K &key) -> bool {
-  if (!std::any_of(list_.begin(), list_.end(), [&](std::pair<K, V> p){return p.first==key;})) {
+  if (!std::any_of(list_.begin(), list_.end(), [&](std::pair<K, V> p) { return p.first == key; })) {
     return false;
   }
-  list_.remove_if([&](std::pair<K, V> p){return p.first == key;});
+  list_.remove_if([&](std::pair<K, V> p) { return p.first == key; });
   return true;
 }
 
@@ -180,7 +178,7 @@ auto ExtendibleHashTable<K, V>::Bucket::Insert(const K &key, const V &value) -> 
   if (IsFull()) {
     return false;
   }
-  for (auto &pair: list_) {
+  for (auto &pair : list_) {
     if (pair.first == key) {
       pair.second = value;
       return true;

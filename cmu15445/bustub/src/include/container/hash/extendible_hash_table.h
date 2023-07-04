@@ -22,7 +22,7 @@
 #include <mutex>  // NOLINT
 #include <utility>
 #include <vector>
-#include "hash_function.h"
+#include "container/hash/hash_function.h"
 #include "container/hash/hash_table.h"
 
 namespace bustub {

@@ -28,6 +28,7 @@ import sys
 
 
 def check(arguments, source_dir):
+    print(arguments)
     formatted_filenames = []
     error = False
     for directory, subdirs, filenames in os.walk(source_dir):

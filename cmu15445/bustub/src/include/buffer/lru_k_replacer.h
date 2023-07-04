@@ -12,16 +12,12 @@
 
 #pragma once
 
-#include <cstddef>
-#include <ctime>
 #include <limits>
 #include <list>
 #include <mutex>  // NOLINT
 #include <unordered_map>
-#include <utility>
 #include <vector>
-#include <memory>
-#include <algorithm>
+
 #include "common/config.h"
 #include "common/macros.h"
 
@@ -127,7 +123,6 @@ class LRUKReplacer {
    */
   void Remove(frame_id_t frame_id);
 
-
   /**
    * TODO(P1): Add implementation
    *
@@ -141,14 +136,22 @@ class LRUKReplacer {
   // TODO(student): implement me! You can replace these member variables as you like.
   // Remove maybe_unused if you start using them.
   [[maybe_unused]] size_t current_timestamp_{0};
-  [[maybe_unused]] size_t curr_size_{0};
-  size_t num_frames_;
+  size_t curr_size_{0};
   size_t replacer_size_;
   size_t k_;
   std::mutex latch_;
-  // history and cache will look like {frame_id: {ref, evictable}}
-  std::vector<std::shared_ptr<std::pair<frame_id_t, std::pair<size_t, bool>>>> history_;
-  std::vector<std::shared_ptr<std::pair<frame_id_t, std::pair<size_t, bool>>>> cache_;
+
+  std::unordered_map<frame_id_t, size_t> access_count_;
+  std::list<frame_id_t> history_list_;
+
+  // history_map_记录每个帧在history_list_的位置，存放的是引用次数少于 K 次的 page
+  std::unordered_map<frame_id_t, std::list<frame_id_t>::iterator> history_map_;
+
+  std::list<frame_id_t> cache_list_;
+  // cache_map_记录每个帧在cache_list_的位置，存放的是引用次数大于等于 K 次的 page
+  std::unordered_map<frame_id_t, std::list<frame_id_t>::iterator> cache_map_;
+
+  std::unordered_map<frame_id_t, bool> is_evictable_;
 };
 
 }  // namespace bustub
