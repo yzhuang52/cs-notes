@@ -409,6 +409,25 @@ thread_set_priority (int new_priority)
   }
 }
 
+void thread_hold_lock(struct lock* lock) {
+  enum intr_level old_level = intr_disable();
+  thread_current()->wait_on_lock = NULL;
+  lock->max_priority = thread_current()->priority;
+  lock->holder = thread_current();
+  list_insert_ordered(&thread_current()->lock_list, &lock->lock_elem, lock_high_priority, NULL);
+  intr_set_level(old_level);
+}
+
+void thread_remove_lock(struct lock* lock) {
+  list_remove(lock->lock_elem);
+}
+
+void thread_donate_priority(struct thread* t) {
+  enum intr_level old_level = intr_disable();
+
+  intr_set_level(old_level);
+}
+
 /** Returns the current thread's priority. */
 int
 thread_get_priority (void) 
@@ -533,8 +552,9 @@ init_thread (struct thread *t, const char *name, int priority)
   strlcpy (t->name, name, sizeof t->name);
   t->stack = (uint8_t *) t + PGSIZE;
   t->priority = priority;
+  t->donated_priority = priority;
   t->magic = THREAD_MAGIC;
-
+  list_init(&t->lock_list);
   old_level = intr_disable ();
   list_insert_ordered(&all_list, &t->allelem, high_priority, NULL);
   intr_set_level (old_level);

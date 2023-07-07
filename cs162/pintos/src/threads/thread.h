@@ -93,7 +93,9 @@ struct thread
     int64_t local_ticks;                /** Local ticks for sleeping threads, marking the time to wake up*/
     /* Shared between thread.c and synch.c. */
     struct list_elem elem;              /**< List element. */
-
+    struct lock* wait_on_lock;          /** Lock that current thread waits for*/
+    struct list lock_list;              /** List for held locks*/
+    int donated_priority;               /** Priority from donor thread*/  
 #ifdef USERPROG
     /* Owned by userprog/process.c. */
     uint32_t *pagedir;                  /**< Page directory. */
@@ -135,6 +137,8 @@ void thread_yield (void);
 typedef void thread_action_func (struct thread *t, void *aux);
 void thread_foreach (thread_action_func *, void *);
 
+void thread_hold_lock(struct lock*);
+void thread_donate_priority(struct thread*);
 int thread_get_priority (void);
 void thread_set_priority (int);
 

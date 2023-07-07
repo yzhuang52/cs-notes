@@ -199,9 +199,33 @@ lock_acquire (struct lock *lock)
   ASSERT (lock != NULL);
   ASSERT (!intr_context ());
   ASSERT (!lock_held_by_current_thread (lock));
+  enum intr_level old_level;
+  old_level = intr_disable();
+  if (lock->holder && !thread_mlfqs) {
+    // Lock not available, current thread should wait
+    // and decide if it should donate its priority to the lock holder
+    // Nested Donation solved here, every time a new thread come, the all threads in wait list
+    // are guaranteed to have the highest priority 
+    thread_current()->wait_on_lock = lock;
+    struct lock* l = lock;
+    while (l && thread_current()->priority > l->max_priority) {
+      l->max_priority = thread_current()->priority;
+      thread_donate_priority(l->holder);
+      l = l->holder->wait_on_lock;
+    }
+  }
 
+  // Lock available, current thread holds the lock
   sema_down (&lock->semaphore);
-  lock->holder = thread_current ();
+  if (!thread_mlfqs) {
+    // Round robin scheduler
+    thread_hold_lock(lock);
+  } else {
+    // Advanced scheduler
+    lock->holder = thread_current ();
+  }
+
+  intr_set_level(old_level);
 }
 
 /** Tries to acquires LOCK and returns true if successful or false
@@ -234,7 +258,7 @@ lock_release (struct lock *lock)
 {
   ASSERT (lock != NULL);
   ASSERT (lock_held_by_current_thread (lock));
-
+  thread_remove_lock(lock);
   lock->holder = NULL;
   sema_up (&lock->semaphore);
 }
@@ -248,6 +272,12 @@ lock_held_by_current_thread (const struct lock *lock)
   ASSERT (lock != NULL);
 
   return lock->holder == thread_current ();
+}
+
+bool lock_high_priority(const struct list_elem* a, const struct list_elem* b, void *aux) {
+  struct lock* lock_a = list_entry(a, struct lock, lock_elem);
+  struct lock* lock_b = list_entry(b, struct lock, lock_elem);
+  return lock_a->max_priority > lock_b->max_priority;
 }
 
 /** One semaphore in a list. */
