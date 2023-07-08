@@ -255,7 +255,7 @@ thread_unblock (struct thread *t)
 
   old_level = intr_disable ();
   ASSERT (t->status == THREAD_BLOCKED);
-  list_insert_ordered (&ready_list, &t->elem, high_priority, NULL);
+  list_insert_ordered (&ready_list, &t->elem, (list_less_func *)&high_priority, NULL);
   t->status = THREAD_READY;
   intr_set_level (old_level);
 }
@@ -454,6 +454,16 @@ void thread_donate_priority(struct thread* t) {
     list_insert_ordered(&ready_list, &t->elem, high_priority, NULL);
   }
   intr_set_level(old_level);
+}
+
+void
+thread_test_preemption (void)
+{
+  enum intr_level old_level = intr_disable ();
+  if (!list_empty (&ready_list) && thread_current ()->priority < 
+      list_entry (list_front (&ready_list), struct thread, elem)->priority)
+      thread_yield ();
+  intr_set_level (old_level);
 }
 
 /** Returns the current thread's priority. */
