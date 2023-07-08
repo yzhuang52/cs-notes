@@ -95,7 +95,7 @@ struct thread
     struct list_elem elem;              /**< List element. */
     struct lock* wait_on_lock;          /** Lock that current thread waits for*/
     struct list lock_list;              /** List for held locks*/
-    int donated_priority;               /** Priority from donor thread*/  
+    int base_priority;               /** Priority from donor thread*/  
 #ifdef USERPROG
     /* Owned by userprog/process.c. */
     uint32_t *pagedir;                  /**< Page directory. */
@@ -130,6 +130,8 @@ struct thread *thread_current (void);
 tid_t thread_tid (void);
 const char *thread_name (void);
 
+void thread_update_priority(struct thread*);
+void thread_remove_lock(struct lock*);
 void thread_exit (void) NO_RETURN;
 void thread_yield (void);
 

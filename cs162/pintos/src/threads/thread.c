@@ -153,7 +153,7 @@ thread_print_stats (void)
 }
 
 /** Return whether a has higher priority than b*/
-bool high_priority(const struct list_elem* a, const struct list_elem* b, void* aux) {
+bool high_priority(const struct list_elem* a, const struct list_elem* b, void* aux UNUSED) {
   struct thread* thread_a = list_entry(a, struct thread, elem);
   struct thread* thread_b = list_entry(b, struct thread, elem);
   return thread_a->priority > thread_b->priority;
@@ -402,29 +402,57 @@ thread_set_priority (int new_priority)
     If the new priority is still the highest, thread_yield will put the current thread to
     the head of ready list.
   */
+  enum intr_level old_level = intr_disable();
   int old_priority = thread_current()->priority;
-  thread_current ()->priority = new_priority;
-  if (old_priority > new_priority) {
+  thread_current ()->base_priority = new_priority;
+  if (list_empty(&thread_current()->lock_list) || old_priority < new_priority) {
+    thread_current()->priority = new_priority;
     thread_yield();
   }
+  intr_set_level(old_level);
 }
 
 void thread_hold_lock(struct lock* lock) {
   enum intr_level old_level = intr_disable();
-  thread_current()->wait_on_lock = NULL;
-  lock->max_priority = thread_current()->priority;
-  lock->holder = thread_current();
+  // thread_current()->wait_on_lock = NULL;
+  // lock->max_priority = thread_current()->priority;
+  // lock->holder = thread_current();
   list_insert_ordered(&thread_current()->lock_list, &lock->lock_elem, lock_high_priority, NULL);
+  if (lock->max_priority > thread_current()->priority) {
+		thread_current()->priority = lock->max_priority;
+		thread_yield();
+	}
   intr_set_level(old_level);
 }
 
 void thread_remove_lock(struct lock* lock) {
-  list_remove(lock->lock_elem);
+  enum intr_level old_level = intr_disable();
+  list_remove(&lock->lock_elem);
+  thread_update_priority(thread_current());
+  intr_set_level(old_level);
+}
+
+void thread_update_priority(struct thread* t) {
+  enum intr_level old_level = intr_disable();
+  int max_priority = t->base_priority;
+  if (!list_empty(&t->lock_list)) {
+    list_sort(&t->lock_list, lock_high_priority, NULL);
+    int lock_priority = list_entry(list_front(&t->lock_list), struct lock, lock_elem)->max_priority;
+    if (lock_priority > max_priority) {
+      max_priority = lock_priority;
+    }
+  }
+  t->priority = max_priority;
+  intr_set_level(old_level);
 }
 
 void thread_donate_priority(struct thread* t) {
   enum intr_level old_level = intr_disable();
-
+  thread_update_priority(t);
+  if (t->status == THREAD_READY) {
+    list_remove(&t->elem);
+    list_insert_ordered(&ready_list, &t->elem, high_priority, NULL);
+  }
   intr_set_level(old_level);
 }
 
@@ -552,8 +580,9 @@ init_thread (struct thread *t, const char *name, int priority)
   strlcpy (t->name, name, sizeof t->name);
   t->stack = (uint8_t *) t + PGSIZE;
   t->priority = priority;
-  t->donated_priority = priority;
+  t->base_priority = priority;
   t->magic = THREAD_MAGIC;
+  t->wait_on_lock = NULL;
   list_init(&t->lock_list);
   old_level = intr_disable ();
   list_insert_ordered(&all_list, &t->allelem, high_priority, NULL);

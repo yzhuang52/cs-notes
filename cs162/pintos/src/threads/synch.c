@@ -68,7 +68,7 @@ sema_down (struct semaphore *sema)
   old_level = intr_disable ();
   while (sema->value == 0) 
   {
-    // printf("sema down: %d\n", thread_current()->tid);
+
     list_insert_ordered(&sema->waiters, &thread_current()->elem, high_priority, NULL);
     thread_block ();
   }
@@ -182,6 +182,7 @@ lock_init (struct lock *lock)
   ASSERT (lock != NULL);
 
   lock->holder = NULL;
+  lock->max_priority = PRI_MIN;
   sema_init (&lock->semaphore, 1);
 }
 
@@ -199,8 +200,7 @@ lock_acquire (struct lock *lock)
   ASSERT (lock != NULL);
   ASSERT (!intr_context ());
   ASSERT (!lock_held_by_current_thread (lock));
-  enum intr_level old_level;
-  old_level = intr_disable();
+  enum intr_level old_level = intr_disable();
   if (lock->holder && !thread_mlfqs) {
     // Lock not available, current thread should wait
     // and decide if it should donate its priority to the lock holder
@@ -217,14 +217,19 @@ lock_acquire (struct lock *lock)
 
   // Lock available, current thread holds the lock
   sema_down (&lock->semaphore);
+  // if (!thread_mlfqs) {
+  //   // Round robin scheduler
+  //   thread_hold_lock(lock);
+  // } else {
+  //   // Advanced scheduler
+  //   lock->holder = thread_current ();
+  // }
   if (!thread_mlfqs) {
-    // Round robin scheduler
-    thread_hold_lock(lock);
-  } else {
-    // Advanced scheduler
-    lock->holder = thread_current ();
+	  thread_current()->wait_on_lock = NULL;
+	  lock->max_priority = thread_current()->priority;
+	  thread_hold_lock(lock);
   }
-
+  lock->holder = thread_current();
   intr_set_level(old_level);
 }
 
@@ -258,7 +263,9 @@ lock_release (struct lock *lock)
 {
   ASSERT (lock != NULL);
   ASSERT (lock_held_by_current_thread (lock));
-  thread_remove_lock(lock);
+  if (!thread_mlfqs) {
+    thread_remove_lock(lock);
+  }
   lock->holder = NULL;
   sema_up (&lock->semaphore);
 }
@@ -274,7 +281,7 @@ lock_held_by_current_thread (const struct lock *lock)
   return lock->holder == thread_current ();
 }
 
-bool lock_high_priority(const struct list_elem* a, const struct list_elem* b, void *aux) {
+bool lock_high_priority(const struct list_elem* a, const struct list_elem* b, void *aux UNUSED) {
   struct lock* lock_a = list_entry(a, struct lock, lock_elem);
   struct lock* lock_b = list_entry(b, struct lock, lock_elem);
   return lock_a->max_priority > lock_b->max_priority;
