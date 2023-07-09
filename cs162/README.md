@@ -27,8 +27,8 @@ The followings are discussions, HWs, Labects checklists
 1. ![#f03c15](https://placehold.co/15x15/f03c15/f03c15.png) HW5 &nbsp;  - ***ONGOING***
 1. ![#f03c15](https://placehold.co/15x15/f03c15/f03c15.png) HW6 &nbsp;  - ***ONGOING***
 
-## Labs (0/5)
-1. ![#f03c15](https://placehold.co/15x15/f03c15/f03c15.png) Lab1 - ***ONGOING*** 
+## Labs (1/5)
+1. ![#c5f015](https://placehold.co/15x15/c5f015/c5f015.png) Lab1 - ***COMPLETED*** 
 1. ![#f03c15](https://placehold.co/15x15/f03c15/f03c15.png) Lab2 - ***ONGOING*** 
 1. ![#f03c15](https://placehold.co/15x15/f03c15/f03c15.png) Lab3a - ***ONGOING***
 1. ![#f03c15](https://placehold.co/15x15/f03c15/f03c15.png) Lab3b - ***ONGOING***

@@ -190,6 +190,15 @@ timer_interrupt (struct intr_frame *args UNUSED)
   old_level = intr_disable();
   ticks++;
   thread_tick ();
+  if (thread_mlfqs) {
+    // Advanced Scheduler
+    thread_mlfqs_increment_recent_cpu(thread_current());
+    if (ticks % TIMER_FREQ == 0) {
+      thread_mlfqs_refresh_priority();
+    } else if (ticks % 4 == 0) {
+      thread_mlfqs_update_priority(thread_current());
+    }
+  }
   if (global_ticks < 0 || ticks < global_ticks) {
     return;
   }

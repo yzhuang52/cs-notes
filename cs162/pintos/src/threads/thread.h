@@ -4,7 +4,7 @@
 #include <debug.h>
 #include <list.h>
 #include <stdint.h>
-
+#include "fixed_point.h"
 /** States in a thread's life cycle. */
 enum thread_status
   {
@@ -100,7 +100,8 @@ struct thread
     /* Owned by userprog/process.c. */
     uint32_t *pagedir;                  /**< Page directory. */
 #endif
-
+    int nice;                           /** Nice value*/
+    fixed_t recent_cpu;                     /** Recent CPU usage*/
     /* Owned by thread.c. */
     unsigned magic;                     /**< Detects stack overflow. */
   };
@@ -148,5 +149,9 @@ int thread_get_nice (void);
 void thread_set_nice (int);
 int thread_get_recent_cpu (void);
 int thread_get_load_avg (void);
+void thread_mlfqs_update_recent_cpu(struct thread*);
+void thread_mlfqs_refresh_priority(void);
+void thread_mlfqs_update_priority(struct thread*);
+void thread_mlfqs_increment_recent_cpu(struct thread*);
 
 #endif /**< threads/thread.h */
