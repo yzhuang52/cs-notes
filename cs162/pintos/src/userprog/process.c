@@ -31,7 +31,7 @@ process_execute (const char *file_name)
 {
   char *fn_copy;
   tid_t tid;
-
+  
   /* Make a copy of FILE_NAME.
      Otherwise there's a race between the caller and load(). */
   fn_copy = malloc(strlen(file_name) + 1);
@@ -45,35 +45,97 @@ process_execute (const char *file_name)
   /* Create a new thread to execute FILE_NAME. */
   tid = thread_create (thread_name, PRI_DEFAULT, start_process, fn_copy);
   if (tid == TID_ERROR)
-    palloc_free_page (fn_copy); 
+    free(fn_copy);
+  
   return tid;
 }
 
+void push_arguments(void **esp, int argc, int *argv) {
+  // /* Push argv[i][...] onto stack*/
+  // for (int i = argc - 1; i >= 0; i--) {
+  //   *esp -= (strlen(argv[i]) + 1);
+  //   memcpy(*esp, argv[i], strlen(argv[i]) + 1);
+  // }
+  // /* Add padding to align stack by 4 byte*/
+  // *esp -= ((unsigned) *esp) % 4;
+  // /* Push argc[i] onto stack, make sure argc[argv] is a nullptr*/
+  // *esp -= sizeof(int*);
+  // for (int i = argc - 1; i >= 0; i--) {
+  //   *esp -= sizeof(int);
+  //   memcpy(*esp, &argv[i], sizeof(int*));
+  // }
+  // /* Push argv and argc*/
+  // *esp -= sizeof(int**);
+  // memcpy(*esp, argv, sizeof(int**));
+  // *esp -= sizeof(int);
+  // *esp = argc;
+  // /* Push return address*/
+  // *esp -= sizeof(int*);
+  // memcpy(*esp,&argv[argc],sizeof(int));
+  *esp = (int)*esp & 0xfffffffc;
+  *esp -= 4;
+  *(int *) *esp = 0;
+  for (int i = argc - 1; i >= 0; i--)
+  {
+    *esp -= 4;
+    *(int *) *esp = argv[i];
+  }
+  *esp -= 4;
+  *(int *) *esp = (int) *esp + 4;
+  *esp -= 4;
+  *(int *) *esp = argc;
+  *esp -= 4;
+  *(int *) *esp = 0;
+}
 /** A thread function that loads a user process and starts it
    running. */
 static void
 start_process (void *file_name_)
 {
   char *file_name = file_name_;
+  /* fn_copy is used to create argc and argv*/
+  char *fn_copy = malloc(strlen(file_name));
+  strlcpy(fn_copy, file_name, strlen(file_name) + 1);
   struct intr_frame if_;
   bool success;
   char *token, *saved_ptr;
   // Get real file name
-  token = strtok_r(file_name, " ", &saved_ptr);
+  file_name = strtok_r(file_name, " ", &saved_ptr);
   /* Initialize interrupt frame and load executable. */
   memset (&if_, 0, sizeof if_);
   if_.gs = if_.fs = if_.es = if_.ds = if_.ss = SEL_UDSEG;
   if_.cs = SEL_UCSEG;
   if_.eflags = FLAG_IF | FLAG_MBS;
-  success = load (token, &if_.eip, &if_.esp);
+  
+  printf("loading\n");
+  lock_acquire(&filesys_lock);
+  // if_.esp is the stack top of user stack
+  // loading the file
+  success = load (file_name, &if_.eip, &if_.esp);
+  lock_release(&filesys_lock);
 
-  /* If load failed, quit. */
-  palloc_free_page (file_name);
+  hex_dump(if_.esp, if_.esp, PHYS_BASE - if_.esp, true);
+
   if (!success) 
     thread_exit ();
-  /*missing part!!! set up the stack*/
+  /* Create argc and argv*/
   int argc = 1;
-
+  printf("argc: %d\n", argc);
+  while (token = strtok_r(NULL, " ", &saved_ptr)) {
+    argc += 1;
+  }
+  int *argv = malloc(sizeof(int) * argc);
+  int arg_index = 0;
+  for (token = strtok_r(fn_copy, " ", &saved_ptr); token != NULL; token = strtok_r(NULL, " ", &saved_ptr)) {
+    if_.esp -= (strlen(token) + 1);
+    memcpy(if_.esp, token, strlen(token) + 1);
+    argv[arg_index++] = (int) if_.esp;
+  }
+  push_arguments(&if_.esp, argc, argv);
+  /* If load failed, quit. */
+  free(file_name);
+  free(fn_copy);
+  free(argv);
   /* Start the user process by simulating a return from an
      interrupt, implemented by intr_exit (in
      threads/intr-stubs.S).  Because intr_exit takes all of its
@@ -222,7 +284,6 @@ load (const char *file_name, void (**eip) (void), void **esp)
   off_t file_ofs;
   bool success = false;
   int i;
-
   /* Allocate and activate page directory. */
   t->pagedir = pagedir_create ();
   if (t->pagedir == NULL) 
@@ -230,7 +291,9 @@ load (const char *file_name, void (**eip) (void), void **esp)
   process_activate ();
 
   /* Open executable file. */
-  file = filesys_open (file_name);
+  char* fn_copy = malloc(strlen(file_name) + 1);
+  strlcpy(fn_copy, file_name, strlen(file_name) + 1);
+  file = filesys_open (fn_copy);
   if (file == NULL) 
     {
       printf ("load: %s: open failed\n", file_name);

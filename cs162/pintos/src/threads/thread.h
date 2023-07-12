@@ -5,6 +5,7 @@
 #include <list.h>
 #include <stdint.h>
 #include "fixed_point.h"
+#include "synch.h"
 /** States in a thread's life cycle. */
 enum thread_status
   {
@@ -23,6 +24,9 @@ typedef int tid_t;
 #define PRI_MIN 0                       /**< Lowest priority. */
 #define PRI_DEFAULT 31                  /**< Default priority. */
 #define PRI_MAX 63                      /**< Highest priority. */
+
+// A global lock on filesystem operations, to ensure thread safety.
+struct lock filesys_lock;
 
 /** A kernel thread or user process.
 
